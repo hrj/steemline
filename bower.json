@@ -1,0 +1,14 @@
+{
+  "name": "steemDeck",
+  "authors": [
+    "mktcode <kontakt@markus-kottlaender.de>"
+  ],
+  "description": "Multifeed for Steemit!",
+  "dependencies": {
+    "uikit": "^2.27.4",
+    "vue": "^2.4.2",
+    "codemirror": "^5.27.4",
+    "marked": "^0.3.6",
+    "moment": "^2.18.1"
+  }
+}
