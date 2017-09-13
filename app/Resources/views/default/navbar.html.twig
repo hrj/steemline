@@ -1,0 +1,115 @@
+<nav class="uk-navbar" id="navbar" data-uk-sticky v-cloak>
+    <div class="uk-navbar-content">
+        <a href="#about" class="logo" data-uk-modal>
+            Steem<br class="uk-visible-small">Line
+        </a>
+    </div>
+    <ul class="uk-navbar-nav">
+        <li>
+            <a href="#" class="add-row">
+                <i class="uk-icon-plus"></i>
+                Add Row
+            </a>
+        </li>
+        <li v-if="account">
+            <a href="#" class="add-row">
+                <i class="uk-icon-pencil"></i>
+                Submit Story
+            </a>
+        </li>
+    </ul>
+    <div class="uk-navbar-content uk-navbar-flip" v-if="connecting">
+        <i class="uk-icon-spinner uk-icon-spin"></i>
+    </div>
+    <ul class="uk-navbar-nav uk-navbar-flip" v-if="!account && !connecting">
+        <li>
+            <a :href="steemconnect.getLoginURL()">
+                <i class="uk-icon-sign-in"></i>
+                Login
+            </a>
+        </li>
+    </ul>
+    <ul class="uk-navbar-nav uk-navbar-flip" v-if="account && !connecting">
+        <li v-if="profileImage">
+            <a href="#sidebar" data-uk-offcanvas="{mode:'slide'}">
+                <span class="profile-image" :style="'background-image: url(https://steemitimages.com/50x50/' + profileImage + ')'"></span>
+            </a>
+        </li>
+        <li v-if="!profileImage">
+            <a href="#sidebar" data-uk-offcanvas="{mode:'slide'}">
+                {% verbatim %}@{{ account.name }}{% endverbatim %}
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<div id="sidebar" class="uk-offcanvas" v-if="account">
+    <div class="uk-offcanvas-bar uk-offcanvas-bar-flip">
+        <div v-if="profileImage && coverImage">
+            <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + ');'">
+                <div class="profile-image" :style="'background-image: url(https://steemitimages.com/150x150/' + profileImage + ')'"></div>
+                <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+            </div>
+        </div>
+
+        <div v-if="profileImage && !coverImage" class="uk-margin-top">
+            <div class="profile-image" :style="'background-image: url(https://steemitimages.com/150x150/' + profileImage + ')'"></div>
+            <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+        </div>
+
+        <div v-if="!profileImage && coverImage">
+            <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + '); height: 40px;'">
+                <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+            </div>
+        </div>
+
+        <div v-if="!profileImage && !coverImage">
+            <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+        </div>
+
+        <div class="uk-grid uk-margin-top uk-margin-bottom uk-text-large">
+            <div class="uk-width-1-2 uk-text-center">
+                <small>Reputation:</small><br>
+                {% verbatim %}{{ reputation }}{% endverbatim %}
+            </div>
+            <div class="uk-width-1-2 uk-text-center">
+                <small>Voting Power:</small><br>
+                {% verbatim %}{{ votingPower }}%{% endverbatim %}
+            </div>
+        </div>
+
+        <ul class="uk-nav uk-nav-offcanvas" data-uk-nav>
+            <li>
+                <a href="https://steemconnect.com/logout">
+                    <i class="uk-icon-sign-out"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="about" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <div class="uk-modal-header">
+            <input type="hidden">
+            <div class="uk-text-center">
+                <div class="logo">SteemLine</div>
+                <div class="uk-text-muted">v0.1</div>
+                <div class="uk-grid uk-margin-top uk-text-large">
+                    <div class="uk-width-1-2">
+                        <a href="https://steemit.com/@mkt" target="_blank" class="avatar"></a>
+                        by <a href="https://steemit.com/@mkt" target="_blank" class="uk-button-link">@mkt</a>
+                    </div>
+                    <div class="uk-width-1-2">
+                        <a href="https://github.com/mktcode/steemit-wall" target="_blank">
+                            <i class="uk-icon-github uk-icon-large" style="font-size: 60px;"></i><br>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

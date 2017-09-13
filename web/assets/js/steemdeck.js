@@ -1,54 +1,279 @@
-let steemDeck = new Vue({
-    el: '#app',
-    data: {
-        account: null,
-        addNewTag: null,
-        addHotTag: null,
-        addTrendingTag: null,
-        addBlogUser: null,
-        addFeedUser: null,
-        rows: [],
-        newRowId: 1
-    },
-    created: function () {
-        if (loadFromLocalStorage('rows')) {
-            this.rows = loadFromLocalStorage('rows');
+// Post
+Vue.component('sw-post', {
+    template: '#post-template',
+    props: ['post'],
+    data: function () {
+        return {
+            meta: {},
+            image: null
         }
     },
+    created: function () {
+        this.meta = JSON.parse(this.post.json_metadata);
+
+        if (this.meta.image) {
+            this.image = this.meta.image[0];
+        }
+    }
+});
+
+// Row
+Vue.component('sw-row', {
+    template: '#row-template',
+    props: ['rows', 'row', 'index'],
+    data: function () {
+        return {
+            posts: [],
+            postIds: [],
+            newPosts: [],
+            updateInterval: null,
+            slider: null,
+            refreshing: false
+        }
+
+    },
+    created: function () {
+        switch (this.row.type) {
+            case 'new':
+                steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    if (!err) {
+                        this.initPosts(posts);
+                        this.updateInterval = setInterval(this.getNewPosts, 10000);
+                    }
+                });
+                break;
+            case 'hot':
+                steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    if (!err) {
+                        this.initPosts(posts);
+                    }
+                });
+                break;
+            case 'trending':
+                steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    if (!err) {
+                        this.initPosts(posts);
+                    }
+                });
+                break;
+            case 'blog':
+                steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    if (!err) {
+                        this.initPosts(posts);
+                        this.updateInterval = setInterval(this.getNewPosts, 10000);
+                    }
+                });
+                break;
+            case 'feed':
+                steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    if (!err) {
+                        this.initPosts(posts);
+                        this.updateInterval = setInterval(this.getNewPosts, 10000);
+                    }
+                });
+                break;
+        }
+    },
+    mounted: function () {
+        this.slider = UIkit.slider(this.$el, {infinite: false, threshold: 50});
+    },
     methods: {
-        resetNewFollowers: function () {
-            this.newFollowers = 0;
+        initPosts: function (posts) {
+            this.posts = posts;
+            this.posts.map((post) => {
+                this.postIds.push(post.id);
+            });
         },
-        resetNewReplies: function () {
-            this.newReplies = 0;
-        },
-        resetNewUpvotes: function () {
-            this.newUpvotes = 0;
-        },
-        addRow: function (type, e) {
-            e.preventDefault();
-            UIkit.modal("#add-row").hide();
-            switch (type) {
+        getNewPosts: function () {
+            switch (this.row.type) {
                 case 'new':
-                    this.rows.unshift({id: this.newRowId++, type: 'new', tag: this.addNewTag});
-                    break;
-                case 'hot':
-                    this.rows.unshift({id: this.newRowId++, type: 'hot', tag: this.addHotTag});
-                    break;
-                case 'trending':
-                    this.rows.unshift({id: this.newRowId++, type: 'trending', tag: this.addTrendingTag});
+                    steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
+                        if (!err) {
+                            this.saveNewPosts(posts);
+                        }
+                    });
                     break;
                 case 'blog':
-                    this.rows.unshift({id: this.newRowId++, type: 'blog', tag: this.addBlogUser});
+                    steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 10}, (err, posts) => {
+                        if (!err) {
+                            this.saveNewPosts(posts);
+                        }
+                    });
                     break;
                 case 'feed':
-                    this.rows.unshift({id: this.newRowId++, type: 'feed', tag: this.addFeedUser});
+                    steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 10}, (err, posts) => {
+                        if (!err) {
+                            this.saveNewPosts(posts);
+                        }
+                    });
                     break;
             }
-            saveToLocalStorage('rows', this.rows);
+        },
+        saveNewPosts: function (posts) {
+            posts.map((post) => {
+                if (this.postIds.indexOf(post.id) == -1) {
+                    this.newPosts.push(post);
+                    this.postIds.push(post.id);
+                }
+            });
+        },
+        showNewPosts: function () {
+            this.posts = this.newPosts.concat(this.posts);
+            this.newPosts = [];
+            this.slider.updateFocus(0, -1);
+        },
+        getOlderPosts: function () {
+            let lastPost = this.posts[this.posts.length - 1];
+            switch (this.row.type) {
+                case 'new':
+                    steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                        if (!err) {
+                            posts.shift();
+                            this.posts = this.posts.concat(posts);
+                        }
+                    });
+                    break;
+                case 'hot':
+                    steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                        if (!err) {
+                            posts.shift();
+                            this.posts = this.posts.concat(posts);
+                        }
+                    });
+                    break;
+                case 'trending':
+                    steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                        if (!err) {
+                            posts.shift();
+                            this.posts = this.posts.concat(posts);
+                        }
+                    });
+                    break;
+                case 'blog':
+                    steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                        if (!err) {
+                            posts.shift();
+                            this.posts = this.posts.concat(posts);
+                        }
+                    });
+                    break;
+                case 'feed':
+                    steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                        if (!err) {
+                            posts.shift();
+                            this.posts = this.posts.concat(posts);
+                        }
+                    });
+                    break;
+            }
+        },
+        refreshPosts: function () {
+            this.refreshing = true;
+            switch (this.row.type) {
+                case 'hot':
+                    steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 10}, (err, posts) => {
+                        if (!err) {
+                            this.posts = posts;
+                            this.refreshing = false;
+                            this.slider.updateFocus(0, -1);
+                        }
+                    });
+                    break;
+                case 'trending':
+                    steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 10}, (err, posts) => {
+                        if (!err) {
+                            this.posts = posts;
+                            this.refreshing = false;
+                            this.slider.updateFocus(0, -1);
+                        }
+                    });
+                    break;
+            }
+        }
+    }
+});
+
+// Main App
+let SteemWall = new Vue({
+    el: '#steemwall',
+    data: {
+        connecting: true,
+        account: null,
+        rows: [
+            {
+                id: 1,
+                type: 'new',
+                tag: 'steemit'
+            },
+            {
+                id: 2,
+                type: 'trending',
+                tag: 'steemdev'
+            }
+        ],
+        newRowId: 3
+    },
+    computed: {
+        metaData: function () {
+            if (this.account && this.account.json_metadata) {
+                return JSON.parse(this.account.json_metadata);
+            }
+            return null;
+        },
+        profile: function () {
+            if (this.metaData && this.metaData.profile) {
+                return this.metaData.profile;
+            }
+            return null;
+        },
+        profileImage: function () {
+            if (this.profile && this.profile.profile_image) {
+                return this.profile.profile_image;
+            }
+            return null;
+        },
+        coverImage: function () {
+            if (this.profile && this.profile.cover_image) {
+                return this.profile.cover_image;
+            }
+            return null;
+        },
+        reputation: function () {
+            return calculateReputation(this.account.reputation, 2);
+        },
+        votingPower: function () {
+            return calculateVotingPower(this.account.voting_power, this.account.last_vote_time, 2);
+        }
+    },
+    created: function () {
+        steemconnect.init({
+            app: appName,
+            callbackURL: redirectUri
+        });
+
+        steemconnect.isAuthenticated((error, auth) => {
+            if (!error && auth.isAuthenticated) {
+                steem.api.getAccounts([auth.username], (error, accounts) => {
+                    this.account = accounts[0];
+                    this.connecting = false;
+
+                    setInterval(this.updateAccount, 10000);
+                });
+            } else {
+                this.connecting = false;
+            }
+        });
+
+        // load rows from local storage
+    },
+    methods: {
+        updateAccount: function () {
+            steem.api.getAccounts([this.account.name], (error, accounts) => {
+                this.account = accounts[0];
+            });
         },
         removeRow: function (key, $event) {
-            $($event.target).parents('.row').css('max-width', $($event.target).parents('.row').outerWidth());
+            $($event.target).parents('.row').css('width', $($event.target).parents('.row').outerWidth());
             this.rows.splice(key, 1);
             saveToLocalStorage('rows', this.rows);
         },
@@ -64,232 +289,19 @@ let steemDeck = new Vue({
                 saveToLocalStorage('rows', this.rows);
             }
         }
-    },
-    components: {
-        'sd-top-bar': {
-            template: '#top-bar-template',
-            data: function () {
-                return {
-                    usernameQuery: null,
-                    lookingUpAccount: false,
-                    account: null,
-                    accountTmp: null,
-                    userInfo: {
-                        account: null,
-                        username: null,
-                        profileImage: null,
-                        meta: null,
-                        reputation: null,
-                        followers: null,
-                        newFollowers: null,
-                        following: null,
-                        posts: null,
-                        replies: null,
-                        newReplies: null,
-                        upvotes: null,
-                        newUpvotes: null,
-                        votingPower: null
-                    },
-                    updateUserInterval: null,
-                    updateUserIntervalSeconds: 30
-                }
-            },
-            created: function () {
-                if (loadFromLocalStorage('username')) {
-                    this.usernameQuery = loadFromLocalStorage('username');
-                    this.lookupAccount(null, true);
-                }
-            },
-            methods: {
-                lookupAccount: function (e, setUserInfoIfFound) {
-                    this.accountTmp = null;
-                    this.lookingUpAccount = true;
-                    steem.api.getAccounts([this.usernameQuery], (err, accounts) => {
-                        if (!err) {
-                            this.accountTmp = accounts[0];
-
-                            if (setUserInfoIfFound) {
-                                this.setUserInfo();
-                            }
-                        }
-
-                        this.lookingUpAccount = false;
-                    });
-                },
-                setUserInfo: function (e) {
-                    if (e) {
-                        e.preventDefault();
-                    }
-                    if (this.accountTmp) {
-                        this.account = this.accountTmp;
-                        this.updateUser();
-                        saveToLocalStorage('username', this.usernameQuery);
-
-                        clearInterval(this.updateUserInterval);
-                        this.updateUserInterval = setInterval(() => {
-                            this.updateUser();
-                        }, this.updateUserIntervalSeconds * 1000);
-                    }
-                },
-                updateUser: function () {
-                    if (this.account) {
-                        steem.api.getAccounts([this.account.name], (err, accounts) => {
-                            if (!err) {
-                                steem.api.getFollowCount(this.account.name, (err, followers) => {
-                                    if (!err) {
-                                        this.account = accounts[0];
-                                        this.userInfo.account = this.account;
-                                        this.userInfo.username = this.account.name;
-                                        this.userInfo.reputation = calculateReputation(this.account.reputation, 0);
-                                        this.userInfo.posts = this.account.post_count;
-                                        this.userInfo.votingPower = calculateVotingPower(this.account.voting_power, this.account.last_vote_time);
-
-                                        this.userInfo.profileImage = null;
-                                        if (this.account.json_metadata) {
-                                            let meta = JSON.parse(this.account.json_metadata);
-                                            if (meta.profile && meta.profile.profile_image) {
-                                                this.userInfo.profileImage = meta.profile.profile_image;
-                                            }
-                                        }
-
-                                        this.userInfo.followers = followers.follower_count;
-                                        this.userInfo.following = followers.following_count;
-                                    }
-                                });
-                            }
-                        });
-                    }
-                },
-                resetAccount: function () {
-                    this.account = null;
-                    this.userInfo = {
-                        account: null,
-                        username: null,
-                        profileImage: null,
-                        meta: null,
-                        reputation: null,
-                        followers: null,
-                        newFollowers: null,
-                        following: null,
-                        posts: null,
-                        replies: null,
-                        newReplies: null,
-                        upvotes: null,
-                        newUpvotes: null,
-                        votingPower: null
-                    };
-                    saveToLocalStorage('username', false);
-                    clearInterval(this.updateUserInterval);
-                }
-            },
-        },
-        'sd-bottom-bar': {
-            template: '#bottom-bar-template',
-            props: ['rows']
-        },
-        'sd-row': {
-            template: '#row-template',
-            props: ['rows', 'row', 'index'],
-            data: function () {
-                return {
-                    posts: {},
-                    newestPost: null,
-                    newPosts: {},
-                    getNewPostsIntervalSeconds: 5,
-                    getNewPostsInterval: null
-                }
-            },
-            created: function () {
-                switch (this.row.type) {
-                    case 'new':
-                        steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
-                            this.posts = posts;
-                        });
-                        break;
-                }
-            },
-            destroyed: function () {
-                clearInterval(this.updateInterval);
-            },
-            methods: {
-                getNewPosts: function () {
-                    switch (this.row.type) {
-                        case 'new':
-                            steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
-                                this.posts = posts;
-                            });
-                            break;
-                    }
-                }
-            },
-            components: {
-                'sd-post': {
-                    template: '#post-template',
-                    props: ['post'],
-                    data: function () {
-                        return {
-                            meta: {},
-                            image: null
-                        }
-                    },
-                    created: function () {
-                        this.meta = JSON.parse(this.post.json_metadata);
-
-                        if (this.meta.image) {
-                            this.image = this.meta.image[0];
-                        }
-                    }
-                }
-            }
-        },
     }
 });
 
-function saveToLocalStorage(key, value) {
-    if (typeof(Storage) !== "undefined") {
-        localStorage.setItem(key, JSON.stringify(value));
-    }
-}
-
-function loadFromLocalStorage(key) {
-    if (typeof(Storage) !== "undefined") {
-        return JSON.parse(localStorage.getItem(key));
-    }
-}
-
-function calculateReputation(reputation, precision) {
-    let score = (reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25);
-
-    return precision ? score.toFixed(2) : Math.floor(score);
-}
-
-function calculateVotingPower(votingPower, lastVoteTime) {
-    let secondsPassedSinceLastVote = (new Date - new Date(lastVoteTime + "Z")) / 1000;
-    votingPower += (10000 * secondsPassedSinceLastVote / 432000);
-
-    return Math.min(votingPower / 100, 100).toFixed(2);
-}
-
-$('#followers').on('show.uk.modal', function () {
-    steemDeck.resetNewFollowers();
-});
-
-$('#replies').on('show.uk.modal', function () {
-    steemDeck.resetNewReplies();
-});
-
-$('#upvotes').on('show.uk.modal', function () {
-    steemDeck.resetNewUpvotes();
-});
-
+// calculate scroll indicator position and width
 $(document).on('focusitem.uk.slider', '.row', function (event, index) {
-    var numberOfPosts = $(this).find('.post').length,
+    let numberOfPosts = $(this).find('.post').length,
         visiblePosts = window.innerWidth > 767 ? (window.innerWidth > 959 ? 4 : 2) : 1;
 
     $(this).find('.scroll-indicator').css('width', (visiblePosts / numberOfPosts * 100).toFixed(2) + '%');
     $(this).find('.scroll-indicator').css('left', ((visiblePosts / numberOfPosts * 100) * (index / visiblePosts )).toFixed(2) + '%');
 });
 
+// handling swipe and click on posts
 let cursorPosition = {};
 
 $(document).on('mousedown', '.open-post', function (e) {
@@ -308,3 +320,30 @@ $(document).on('mouseup', '.open-post', function (e) {
         }
     }
 });
+
+// Helper Functions
+
+function calculateReputation(reputation, precision) {
+    let score = parseFloat((reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25));
+
+    return precision ? score.toFixed(precision) : Math.floor(score);
+}
+
+function calculateVotingPower(votingPower, lastVoteTime, precision) {
+    let secondsPassedSinceLastVote = (new Date - new Date(lastVoteTime + "Z")) / 1000;
+    votingPower += (10000 * secondsPassedSinceLastVote / 432000);
+
+    return Math.min(votingPower / 100, 100).toFixed(precision);
+}
+
+function saveToLocalStorage(key, value) {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+}
+
+function loadFromLocalStorage(key) {
+    if (typeof(Storage) !== "undefined") {
+        return JSON.parse(localStorage.getItem(key));
+    }
+}

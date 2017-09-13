@@ -1,23 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div id="app">
-        <sd-top-bar></sd-top-bar>
-
-        <transition name="fade">
-            <div v-if="rows.length == 0" id="add-row-big">
-                <a href="#add-row" class="uk-button uk-button-large uk-button-success uk-width-1-1 uk-display-block"
-                   data-uk-modal>
-                    <i class="uk-icon-plus"></i> Add Row<br>
-                </a>
-                <div id="info-text" class="uk-width-medium-1-2 uk-push-1-4 uk-margin-top uk-margin-bottom">
-                    Add a user's blog or feed or the trending page for a given tag or all new posts. Or just all of them. You can add multiple rows!
-                </div>
-            </div>
-        </transition>
+    <div id="steemwall">
+        {% include 'default/navbar.html.twig' %}
 
         <transition-group name="rows" tag="div" id="rows">
-            <sd-row v-for="(row, key) in rows"
+            <sw-row v-for="(row, key) in rows"
                     v-bind:rows="rows"
                     v-bind:row="row"
                     v-bind:index="key"
@@ -25,27 +13,10 @@
                     v-on:remove="removeRow(key, $event)"
                     v-on:up="rowUp(key)"
                     v-on:down="rowDown(key)">
-            </sd-row>
+            </sw-row>
         </transition-group>
-
-        <sd-bottom-bar v-bind:rows="rows"></sd-bottom-bar>
-
-        <!-- Modals -->
-
-        {% include 'default/post-modal.html.twig' %}
-        {% include 'default/followers-modal.html.twig' %}
-        {% include 'default/upvotes-modal.html.twig' %}
-        {% include 'default/replies-modal.html.twig' %}
-        {% include 'default/submit-story-modal.html.twig' %}
-        {% include 'default/settings-modal.html.twig' %}
-        {% include 'default/add-row-modal.html.twig' %}
-        {% include 'default/about-modal.html.twig' %}
     </div>
 
-    <!-- Templates -->
-
-    {% include 'default/top-bar.html.twig' %}
-    {% include 'default/row.html.twig' %}
-    {% include 'default/post.html.twig' %}
-    {% include 'default/bottom-bar.html.twig' %}
+    {% include 'default/row-template.html.twig' %}
+    {% include 'default/post-template.html.twig' %}
 {% endblock %}
