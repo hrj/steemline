@@ -4,14 +4,14 @@
             <nav class="uk-navbar line-header">
                 <ul v-if="line.type == 'hot' || line.type == 'trending'" class="uk-navbar-nav">
                     <li>
-                        <a v-on:click="refreshPosts" class="uk-text-muted" href="#" title="refresh" data-uk-tooltip="{pos:'bottom-right'}">
+                        <a @click="refreshPosts($event)" class="uk-text-muted" href="#" title="refresh" data-uk-tooltip="{pos:'bottom-right'}">
                             <i :class="'uk-icon-refresh' + (refreshing ? ' uk-icon-spin' : '')"></i>
                         </a>
                     </li>
                 </ul>
                 <ul v-if="newPosts.length && line.type != 'hot' && line.type != 'trending'" class="uk-navbar-nav">
                     <li>
-                        <a v-on:click="showNewPosts" href="#" title="show new posts" data-uk-tooltip="{pos:'bottom-right'}">
+                        <a @click="showNewPosts($event)" href="#" title="show new posts" data-uk-tooltip="{pos:'bottom-right'}">
                             <span class="uk-badge uk-badge-notification">
                                 {% verbatim %}{{ newPosts.length }}{% endverbatim %}
                             </span>
@@ -23,22 +23,22 @@
                 </div>
                 <ul class="uk-navbar-nav uk-navbar-flip">
                     <li>
-                        <a v-if="index != 0" href="#" data-uk-tooltip title="move up" class="uk-text-muted" v-on:click="$emit('up', $event)">
+                        <a v-if="index != 0" href="#" data-uk-tooltip title="move up" class="uk-text-muted" @click="$emit('up', $event)">
                             <i class="uk-icon-angle-up"></i>
                         </a>
                     </li>
                     <li>
-                        <a v-if="index != lines.length - 1" href="#" data-uk-tooltip title="move down" class="uk-text-muted" v-on:click="$emit('down', $event)">
+                        <a v-if="index != lines.length - 1" href="#" data-uk-tooltip title="move down" class="uk-text-muted" @click="$emit('down', $event)">
                             <i class="uk-icon-angle-down"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="uk-text-muted" data-uk-tooltip title="load older posts" v-on:click="getOlderPosts">
+                        <a href="#" class="uk-text-muted" data-uk-tooltip title="load older posts" @click="getOlderPosts($event)">
                             <i class="uk-icon-angle-double-right"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-uk-tooltip title="close" class="uk-text-muted" v-on:click="$emit('remove', $event)">
+                        <a href="#" data-uk-tooltip title="close" class="uk-text-muted" @click="$emit('remove', $event)">
                             <i class="uk-icon-times"></i>
                         </a>
                     </li>

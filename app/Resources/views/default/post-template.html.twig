@@ -1,23 +1,23 @@
 <script type="text/x-template" id="post-template">
     <li class="post">
-        <a class="post-image open-post" href="#post" v-bind:style="'background-image: url(https://steemitimages.com/400x400/' + image + ');'"></a>
+        <a class="post-image open-post" href="#" :style="'background-image: url(' + (image ? 'https://steemitimages.com/400x400/' + image : '/assets/img/default-post-image.jpg') + ');'"></a>
         <div class="post-info">
             <h3 class="uk-text-truncate uk-margin-remove">
-                <a href="#post" class="open-post">{% verbatim %}{{ post.title }}{% endverbatim %}</a>
+                <a href="#" class="open-post">{% verbatim %}{{ post.title }}{% endverbatim %}</a>
             </h3>
             <div class="uk-text-small uk-text-muted">
-                an hour ago
-                by <a v-bind:href="'https://steemit.com/@' + post.author" target="_blank">{% verbatim %}{{ post.author }}{% endverbatim %}</a>
-                <span class="reputation">55</span>
-                in <a v-bind:href="'https://steemit.com/trending/' + post.category" target="_blank">{% verbatim %}{{ post.category }}{% endverbatim %}</a>
+                {% verbatim %}{{ postCreated }}{% endverbatim %}
+                by <a :href="'https://steemit.com/@' + post.author" target="_blank">{% verbatim %}{{ post.author }}{% endverbatim %}</a>
+                <span class="reputation">{% verbatim %}{{ authorReputation }}{% endverbatim %}</span>
+                in <a :href="'https://steemit.com/trending/' + post.category" target="_blank">{% verbatim %}{{ post.category }}{% endverbatim %}</a>
             </div>
             <hr class="uk-margin-small-top uk-margin-small-bottom">
             <div class="uk-text-muted uk-text-center uk-grid">
                 <div class="uk-width-1-3">
-                    $ 69.24
+                    $ {% verbatim %}{{ payout }}{% endverbatim %}
                 </div>
                 <div class="uk-width-1-3">
-                    <i class="uk-icon-angle-up"></i> 54
+                    <i class="uk-icon-angle-up"></i> {% verbatim %}{{ post.net_votes }}{% endverbatim %}
                 </div>
                 <div class="uk-width-1-3">
                     <i class="uk-icon-comments"></i> {% verbatim %}{{ post.children }}{% endverbatim %}

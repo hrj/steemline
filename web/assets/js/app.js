@@ -8,6 +8,25 @@ Vue.component('sw-post', {
             image: null
         }
     },
+    computed: {
+        postCreated: function () {
+            return moment.utc(new Date(this.post.created)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss'));
+        },
+        authorReputation: function () {
+            return calculateReputation(this.post.author_reputation, 0);
+        },
+        payout: function() {
+            if (this.post.last_payout == '1970-01-01T00:00:00') {
+                let payout = this.post.pending_payout_value.replace(' SBD', '');
+                return parseFloat(payout).toFixed(2);
+            }
+
+            let authorPayout = this.post.total_payout_value.replace(' SBD', ''),
+                curatorPayout = this.post.curator_payout_value.replace(' SBD', '');
+
+            return (parseFloat(authorPayout) + parseFloat(curatorPayout)).toFixed(2);
+        }
+    },
     created: function () {
         this.meta = JSON.parse(this.post.json_metadata);
 
@@ -117,12 +136,14 @@ Vue.component('sw-line', {
                 }
             });
         },
-        showNewPosts: function () {
+        showNewPosts: function ($event) {
+            $event.preventDefault();
             this.posts = this.newPosts.concat(this.posts);
             this.newPosts = [];
             this.slider.updateFocus(0, -1);
         },
-        getOlderPosts: function () {
+        getOlderPosts: function ($event) {
+            $event.preventDefault();
             let lastPost = this.posts[this.posts.length - 1];
             switch (this.line.type) {
                 case 'new':
@@ -167,7 +188,8 @@ Vue.component('sw-line', {
                     break;
             }
         },
-        refreshPosts: function () {
+        refreshPosts: function ($event) {
+            $event.preventDefault();
             this.refreshing = true;
             switch (this.line.type) {
                 case 'hot':
@@ -287,6 +309,7 @@ let SteemLine = new Vue({
             $($event.target).parents('.line').css('width', $($event.target).parents('.line').outerWidth());
             this.lines.splice(key, 1);
             saveToLocalStorage('lines', this.lines);
+            setTimeout(function() {$(window).resize();}, 750);
         },
         lineUp: function (key, $event) {
             $event.preventDefault();
