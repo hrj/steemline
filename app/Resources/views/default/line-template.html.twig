@@ -1,15 +1,15 @@
-<script type="text/x-template" id="row-template">
-    <div class="row">
+<script type="text/x-template" id="line-template">
+    <div class="line">
         <div class="uk-slider-container" style="position: relative;">
-            <nav class="uk-navbar row-header">
-                <ul v-if="row.type == 'hot' || row.type == 'trending'" class="uk-navbar-nav">
+            <nav class="uk-navbar line-header">
+                <ul v-if="line.type == 'hot' || line.type == 'trending'" class="uk-navbar-nav">
                     <li>
                         <a v-on:click="refreshPosts" class="uk-text-muted" href="#" title="refresh" data-uk-tooltip="{pos:'bottom-right'}">
                             <i :class="'uk-icon-refresh' + (refreshing ? ' uk-icon-spin' : '')"></i>
                         </a>
                     </li>
                 </ul>
-                <ul v-if="newPosts.length && row.type != 'hot' && row.type != 'trending'" class="uk-navbar-nav">
+                <ul v-if="newPosts.length && line.type != 'hot' && line.type != 'trending'" class="uk-navbar-nav">
                     <li>
                         <a v-on:click="showNewPosts" href="#" title="show new posts" data-uk-tooltip="{pos:'bottom-right'}">
                             <span class="uk-badge uk-badge-notification">
@@ -18,17 +18,17 @@
                         </a>
                     </li>
                 </ul>
-                <div class="uk-navbar-content uk-text-large row-title">
-                    {% verbatim %}{{ row.type }} <span class="uk-text-muted" v-if="row.tag">#{{ row.tag }}</span>{% endverbatim %}
+                <div class="uk-navbar-content uk-text-large line-title">
+                    {% verbatim %}{{ line.type }} <span class="uk-text-muted" v-if="line.tag">#{{ line.tag }}</span>{% endverbatim %}
                 </div>
                 <ul class="uk-navbar-nav uk-navbar-flip">
                     <li>
-                        <a v-if="index != 0" href="#" class="uk-text-muted row-sort-handle" v-on:click="$emit('up')">
+                        <a v-if="index != 0" href="#" data-uk-tooltip title="move up" class="uk-text-muted" v-on:click="$emit('up')">
                             <i class="uk-icon-angle-up"></i>
                         </a>
                     </li>
                     <li>
-                        <a v-if="index != rows.length - 1" href="#" class="uk-text-muted row-sort-handle" v-on:click="$emit('down')">
+                        <a v-if="index != lines.length - 1" href="#" data-uk-tooltip title="move down" class="uk-text-muted" v-on:click="$emit('down')">
                             <i class="uk-icon-angle-down"></i>
                         </a>
                     </li>
@@ -38,7 +38,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="uk-text-muted" v-on:click="$emit('remove', $event)">
+                        <a href="#" data-uk-tooltip title="close" class="uk-text-muted" v-on:click="$emit('remove', $event)">
                             <i class="uk-icon-times"></i>
                         </a>
                     </li>

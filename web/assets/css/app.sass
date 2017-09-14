@@ -42,7 +42,7 @@ body *
     margin-top: 3px
     box-sizing: border-box
 
-  .add-row
+  .add-line
     cursor: pointer
     transition: background .3s ease, color .3s ease
     &:hover
@@ -97,10 +97,10 @@ body *
     background-position: center center
     background-size: cover
 
-#rows
+#lines
   padding: 10px
 
-#rows .row
+#lines .line
   transition: all 1s
   margin-bottom: 10px
   z-index: 1
@@ -109,23 +109,23 @@ body *
   background: repeating-linear-gradient(-45deg, #383838, #383838 5px, #333 5px, #333 10px)
   min-height: 376px
 
-.row-nav
+.line-nav
   position: absolute
   top: 38px
   left: 0
   right: 0
   height: 2px
 
-.row-header
+.line-header
   background: #333
   color: #fff
   border-radius: 0
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+  .uk-navbar-nav > li > a
+    padding: 0 10px
+    cursor: pointer
 
-.row-header .uk-navbar-nav > li > a
-  padding: 0 10px
-
-.row-title
+.line-title
   display: inline-block
   line-height: 40px
 
@@ -194,13 +194,13 @@ body *
  * Transitions
  */
 
-.rows-enter,
-.rows-leave-to
+.lines-enter,
+.lines-leave-to
   opacity: 0
   transform: translateY(-30px)
 
-.rows-leave-active
+.lines-leave-active
   position: absolute
 
-.row-move
+.line-move
   transition: transform .5s

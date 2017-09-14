@@ -17,10 +17,10 @@ Vue.component('sw-post', {
     }
 });
 
-// Row
-Vue.component('sw-row', {
-    template: '#row-template',
-    props: ['rows', 'row', 'index'],
+// Line
+Vue.component('sw-line', {
+    template: '#line-template',
+    props: ['lines', 'line', 'index'],
     data: function () {
         return {
             posts: [],
@@ -33,9 +33,9 @@ Vue.component('sw-row', {
 
     },
     created: function () {
-        switch (this.row.type) {
+        switch (this.line.type) {
             case 'new':
-                steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
+                steem.api.getDiscussionsByCreated({tag: this.line.tag, limit: 10}, (err, posts) => {
                     if (!err) {
                         this.initPosts(posts);
                         this.updateInterval = setInterval(this.getNewPosts, 10000);
@@ -43,21 +43,21 @@ Vue.component('sw-row', {
                 });
                 break;
             case 'hot':
-                steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 10}, (err, posts) => {
+                steem.api.getDiscussionsByHot({tag: this.line.tag, limit: 10}, (err, posts) => {
                     if (!err) {
                         this.initPosts(posts);
                     }
                 });
                 break;
             case 'trending':
-                steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 10}, (err, posts) => {
+                steem.api.getDiscussionsByTrending({tag: this.line.tag, limit: 10}, (err, posts) => {
                     if (!err) {
                         this.initPosts(posts);
                     }
                 });
                 break;
             case 'blog':
-                steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 10}, (err, posts) => {
+                steem.api.getDiscussionsByBlog({tag: this.line.tag, limit: 10}, (err, posts) => {
                     if (!err) {
                         this.initPosts(posts);
                         this.updateInterval = setInterval(this.getNewPosts, 10000);
@@ -65,7 +65,7 @@ Vue.component('sw-row', {
                 });
                 break;
             case 'feed':
-                steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 10}, (err, posts) => {
+                steem.api.getDiscussionsByFeed({tag: this.line.tag, limit: 10}, (err, posts) => {
                     if (!err) {
                         this.initPosts(posts);
                         this.updateInterval = setInterval(this.getNewPosts, 10000);
@@ -85,23 +85,23 @@ Vue.component('sw-row', {
             });
         },
         getNewPosts: function () {
-            switch (this.row.type) {
+            switch (this.line.type) {
                 case 'new':
-                    steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    steem.api.getDiscussionsByCreated({tag: this.line.tag, limit: 10}, (err, posts) => {
                         if (!err) {
                             this.saveNewPosts(posts);
                         }
                     });
                     break;
                 case 'blog':
-                    steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    steem.api.getDiscussionsByBlog({tag: this.line.tag, limit: 10}, (err, posts) => {
                         if (!err) {
                             this.saveNewPosts(posts);
                         }
                     });
                     break;
                 case 'feed':
-                    steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    steem.api.getDiscussionsByFeed({tag: this.line.tag, limit: 10}, (err, posts) => {
                         if (!err) {
                             this.saveNewPosts(posts);
                         }
@@ -124,9 +124,9 @@ Vue.component('sw-row', {
         },
         getOlderPosts: function () {
             let lastPost = this.posts[this.posts.length - 1];
-            switch (this.row.type) {
+            switch (this.line.type) {
                 case 'new':
-                    steem.api.getDiscussionsByCreated({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                    steem.api.getDiscussionsByCreated({tag: this.line.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
                         if (!err) {
                             posts.shift();
                             this.posts = this.posts.concat(posts);
@@ -134,7 +134,7 @@ Vue.component('sw-row', {
                     });
                     break;
                 case 'hot':
-                    steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                    steem.api.getDiscussionsByHot({tag: this.line.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
                         if (!err) {
                             posts.shift();
                             this.posts = this.posts.concat(posts);
@@ -142,7 +142,7 @@ Vue.component('sw-row', {
                     });
                     break;
                 case 'trending':
-                    steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                    steem.api.getDiscussionsByTrending({tag: this.line.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
                         if (!err) {
                             posts.shift();
                             this.posts = this.posts.concat(posts);
@@ -150,7 +150,7 @@ Vue.component('sw-row', {
                     });
                     break;
                 case 'blog':
-                    steem.api.getDiscussionsByBlog({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                    steem.api.getDiscussionsByBlog({tag: this.line.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
                         if (!err) {
                             posts.shift();
                             this.posts = this.posts.concat(posts);
@@ -158,7 +158,7 @@ Vue.component('sw-row', {
                     });
                     break;
                 case 'feed':
-                    steem.api.getDiscussionsByFeed({tag: this.row.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
+                    steem.api.getDiscussionsByFeed({tag: this.line.tag, limit: 11, start_author: lastPost.author, start_permlink: lastPost.permlink}, (err, posts) => {
                         if (!err) {
                             posts.shift();
                             this.posts = this.posts.concat(posts);
@@ -169,9 +169,9 @@ Vue.component('sw-row', {
         },
         refreshPosts: function () {
             this.refreshing = true;
-            switch (this.row.type) {
+            switch (this.line.type) {
                 case 'hot':
-                    steem.api.getDiscussionsByHot({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    steem.api.getDiscussionsByHot({tag: this.line.tag, limit: 10}, (err, posts) => {
                         if (!err) {
                             this.posts = posts;
                             this.refreshing = false;
@@ -180,7 +180,7 @@ Vue.component('sw-row', {
                     });
                     break;
                 case 'trending':
-                    steem.api.getDiscussionsByTrending({tag: this.row.tag, limit: 10}, (err, posts) => {
+                    steem.api.getDiscussionsByTrending({tag: this.line.tag, limit: 10}, (err, posts) => {
                         if (!err) {
                             this.posts = posts;
                             this.refreshing = false;
@@ -199,7 +199,7 @@ let SteemWall = new Vue({
     data: {
         connecting: true,
         account: null,
-        rows: [
+        lines: [
             {
                 id: 1,
                 type: 'new',
@@ -211,7 +211,7 @@ let SteemWall = new Vue({
                 tag: 'steemdev'
             }
         ],
-        newRowId: 3
+        newLineId: 3
     },
     computed: {
         metaData: function () {
@@ -264,7 +264,7 @@ let SteemWall = new Vue({
             }
         });
 
-        // load rows from local storage
+        // load lines from local storage
     },
     methods: {
         updateAccount: function () {
@@ -272,28 +272,50 @@ let SteemWall = new Vue({
                 this.account = accounts[0];
             });
         },
-        removeRow: function (key, $event) {
-            $($event.target).parents('.row').css('width', $($event.target).parents('.row').outerWidth());
-            this.rows.splice(key, 1);
-            saveToLocalStorage('rows', this.rows);
+        removeLine: function (key, $event) {
+            $($event.target).parents('.line').css('width', $($event.target).parents('.line').outerWidth());
+            this.lines.splice(key, 1);
+            saveToLocalStorage('lines', this.lines);
         },
-        rowUp: function (key) {
+        lineUp: function (key) {
             if (key > 0) {
-                this.rows[key] = this.rows.splice(key - 1, 1, this.rows[key])[0];
-                saveToLocalStorage('rows', this.rows);
+                this.lines[key] = this.lines.splice(key - 1, 1, this.lines[key])[0];
+                saveToLocalStorage('lines', this.lines);
             }
         },
-        rowDown: function (key) {
-            if (key < this.rows.length - 1) {
-                this.rows[key] = this.rows.splice(key + 1, 1, this.rows[key])[0];
-                saveToLocalStorage('rows', this.rows);
+        lineDown: function (key) {
+            if (key < this.lines.length - 1) {
+                this.lines[key] = this.lines.splice(key + 1, 1, this.lines[key])[0];
+                saveToLocalStorage('lines', this.lines);
             }
+        },
+        addLine: function (type, e) {
+            e.preventDefault();
+            UIkit.modal("#add-line").hide();
+            switch (type) {
+                case 'new':
+                    this.lines.unshift({id: this.newLineId++, type: 'new', tag: this.addNewTag});
+                    break;
+                case 'hot':
+                    this.lines.unshift({id: this.newLineId++, type: 'hot', tag: this.addHotTag});
+                    break;
+                case 'trending':
+                    this.lines.unshift({id: this.newLineId++, type: 'trending', tag: this.addTrendingTag});
+                    break;
+                case 'blog':
+                    this.lines.unshift({id: this.newLineId++, type: 'blog', tag: this.addBlogUser});
+                    break;
+                case 'feed':
+                    this.lines.unshift({id: this.newLineId++, type: 'feed', tag: this.addFeedUser});
+                    break;
+            }
+            saveToLocalStorage('lines', this.lines);
         }
     }
 });
 
 // calculate scroll indicator position and width
-$(document).on('focusitem.uk.slider', '.row', function (event, index) {
+$(document).on('focusitem.uk.slider', '.line', function (event, index) {
     let numberOfPosts = $(this).find('.post').length,
         visiblePosts = window.innerWidth > 767 ? (window.innerWidth > 959 ? 4 : 2) : 1;
 
