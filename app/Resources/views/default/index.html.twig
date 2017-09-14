@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div id="steemwall">
+    <div id="steemline">
         {% include 'default/navbar.html.twig' %}
 
         <transition-group name="lines" tag="div" id="lines">
@@ -11,10 +11,12 @@
                     v-bind:index="key"
                     v-bind:key="line.id"
                     v-on:remove="removeLine(key, $event)"
-                    v-on:up="lineUp(key)"
-                    v-on:down="lineDown(key)">
+                    v-on:up="lineUp(key, $event)"
+                    v-on:down="lineDown(key, $event)">
             </sw-line>
         </transition-group>
+
+        {% include 'default/add-line-modal.html.twig' %}
     </div>
 
     {% include 'default/line-template.html.twig' %}

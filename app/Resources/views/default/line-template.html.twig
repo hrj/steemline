@@ -23,12 +23,12 @@
                 </div>
                 <ul class="uk-navbar-nav uk-navbar-flip">
                     <li>
-                        <a v-if="index != 0" href="#" data-uk-tooltip title="move up" class="uk-text-muted" v-on:click="$emit('up')">
+                        <a v-if="index != 0" href="#" data-uk-tooltip title="move up" class="uk-text-muted" v-on:click="$emit('up', $event)">
                             <i class="uk-icon-angle-up"></i>
                         </a>
                     </li>
                     <li>
-                        <a v-if="index != lines.length - 1" href="#" data-uk-tooltip title="move down" class="uk-text-muted" v-on:click="$emit('down')">
+                        <a v-if="index != lines.length - 1" href="#" data-uk-tooltip title="move down" class="uk-text-muted" v-on:click="$emit('down', $event)">
                             <i class="uk-icon-angle-down"></i>
                         </a>
                     </li>

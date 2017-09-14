@@ -194,12 +194,13 @@ Vue.component('sw-line', {
 });
 
 // Main App
-let SteemWall = new Vue({
-    el: '#steemwall',
+let SteemLine = new Vue({
+    el: '#steemline',
     data: {
         connecting: true,
         account: null,
-        lines: [
+        lines: [],
+        defaultLines: [
             {
                 id: 1,
                 type: 'new',
@@ -211,7 +212,12 @@ let SteemWall = new Vue({
                 tag: 'steemdev'
             }
         ],
-        newLineId: 3
+        newLineId: 3,
+        addNewTag: null,
+        addHotTag: null,
+        addTrendingTag: null,
+        addBlogUser: null,
+        addFeedUser: null,
     },
     computed: {
         metaData: function () {
@@ -264,7 +270,11 @@ let SteemWall = new Vue({
             }
         });
 
-        // load lines from local storage
+        if (loadFromLocalStorage('lines')) {
+            this.lines = loadFromLocalStorage('lines');
+        } else {
+            this.lines = this.defaultLines;
+        }
     },
     methods: {
         updateAccount: function () {
@@ -273,17 +283,20 @@ let SteemWall = new Vue({
             });
         },
         removeLine: function (key, $event) {
+            $event.preventDefault();
             $($event.target).parents('.line').css('width', $($event.target).parents('.line').outerWidth());
             this.lines.splice(key, 1);
             saveToLocalStorage('lines', this.lines);
         },
-        lineUp: function (key) {
+        lineUp: function (key, $event) {
+            $event.preventDefault();
             if (key > 0) {
                 this.lines[key] = this.lines.splice(key - 1, 1, this.lines[key])[0];
                 saveToLocalStorage('lines', this.lines);
             }
         },
-        lineDown: function (key) {
+        lineDown: function (key, $event) {
+            $event.preventDefault();
             if (key < this.lines.length - 1) {
                 this.lines[key] = this.lines.splice(key + 1, 1, this.lines[key])[0];
                 saveToLocalStorage('lines', this.lines);
