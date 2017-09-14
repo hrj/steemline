@@ -91,7 +91,7 @@ body * {
   padding: 10px; }
 
 #lines .line {
-  transition: all 1s;
+  transition: all 0.5s;
   margin-bottom: 10px;
   z-index: 1;
   box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 10px;
