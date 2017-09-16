@@ -7,12 +7,14 @@
     <title>{% block title %}SteemLine{% endblock %}</title>
     {% block stylesheets %}
         {% stylesheets
+        'assets/vendor/jquery-ui/themes/base/jquery-ui.min.css'
         'assets/vendor/uikit/css/uikit.min.css'
         'assets/vendor/uikit/css/components/tooltip.min.css'
         'assets/vendor/uikit/css/components/slider.min.css'
         'assets/vendor/uikit/css/components/sticky.min.css'
-        'assets/vendor/codemirror/lib/codemirror.css'
+        'assets/vendor/uikit/css/components/notify.min.css'
         'assets/vendor/uikit/css/components/htmleditor.min.css'
+        'assets/vendor/codemirror/lib/codemirror.css'
         'assets/css/fonts.css'
         'assets/css/app.css'
         filter='cssrewrite'
@@ -31,6 +33,7 @@
     </script>
     {% javascripts
     'assets/vendor/jquery/dist/jquery.min.js'
+    'assets/vendor/jquery-ui/jquery-ui.min.js'
     'assets/vendor/moment/min/moment.min.js'
     'assets/vendor/codemirror/lib/codemirror.js'
     'assets/vendor/codemirror/mode/markdown/markdown.js'
@@ -42,6 +45,7 @@
     'assets/vendor/uikit/js/components/tooltip.min.js'
     'assets/vendor/uikit/js/components/slider.min.js'
     'assets/vendor/uikit/js/components/sticky.min.js'
+    'assets/vendor/uikit/js/components/notify.min.js'
     'assets/vendor/uikit/js/components/htmleditor.min.js'
     'assets/vendor/vue/dist/vue.min.js'
     'assets/js/steem.min.js'

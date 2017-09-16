@@ -48,7 +48,12 @@
                 <div class="scroll-indicator"></div>
             </div>
             <ul class="uk-slider uk-grid-width-medium-1-2 uk-grid-width-large-1-4">
-                <sw-post v-for="post in posts" v-bind:key="post.id" v-bind:post="post"></sw-post>
+                <sw-post
+                    v-for="post in posts"
+                    :key="post.id"
+                    :post="post"
+                    :account="account"
+                ></sw-post>
             </ul>
         </div>
     </div>

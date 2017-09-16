@@ -1,11 +1,13 @@
 // Post
 Vue.component('sw-post', {
     template: '#post-template',
-    props: ['post'],
+    props: ['post', 'account'],
     data: function () {
         return {
             meta: {},
-            image: null
+            image: null,
+            voting: false,
+            votingPower: 100
         }
     },
     computed: {
@@ -33,13 +35,73 @@ Vue.component('sw-post', {
         if (this.meta.image) {
             this.image = this.meta.image[0];
         }
+    },
+    methods: {
+        vote: function () {
+            if (this.account) {
+                this.voting = true;
+                steemconnect.vote(this.account.name, this.post.author, this.post.permlink, this.votingPower * 100, (err, result) => {
+                    console.log(err, result);
+                    this.voting = false;
+
+                    if (!err) {
+                        steem.api.getContent(this.post.author, this.post.permlink, (err, result) => {
+                            this.post = result;
+
+                            UIkit.dropdown(".post-vote-dropdown").hide();
+                        });
+                    } else {
+                        UIkit.notify({
+                            message : 'Error: Maximum allowed changes exceeded!',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos     : 'top-center'
+                        });
+                    }
+                });
+            }
+        },
+        removeVote: function () {
+            if (this.account) {
+                this.voting = true;
+                steemconnect.vote(this.account.name, this.post.author, this.post.permlink, 0, (err, result) => {
+                    console.log(err, result);
+                    this.voting = false;
+
+                    if (!err) {
+                        steem.api.getContent(this.post.author, this.post.permlink, (err, result) => {
+                            this.post = result;
+
+                            UIkit.dropdown(".post-vote-dropdown").hide();
+                        });
+                    } else {
+                        UIkit.notify({
+                            message : '<b>Error</b>: Maximum allowed changes exceeded!',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos     : 'top-center'
+                        });
+                    }
+                });
+            }
+        },
+        isUpvoted: function () {
+            if (this.account) {
+                for (let i = 0; i < this.post.active_votes.length; i++) {
+                    if (this.post.active_votes[i].voter == this.account.name && this.post.active_votes[i].percent > 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 });
 
 // Line
 Vue.component('sw-line', {
     template: '#line-template',
-    props: ['lines', 'line', 'index'],
+    props: ['lines', 'line', 'index', 'account'],
     data: function () {
         return {
             posts: [],
@@ -301,6 +363,10 @@ let SteemLine = new Vue({
     methods: {
         updateAccount: function () {
             steem.api.getAccounts([this.account.name], (error, accounts) => {
+                /**
+                 * Why the f*** does this line cause the vote dialog/vote state to reset...
+                 * Upvote a post, see the state change and then flip back again once this line is executed.
+                 */
                 this.account = accounts[0];
             });
         },

@@ -6,13 +6,14 @@
 
         <transition-group name="lines" tag="div" id="lines">
             <sw-line v-for="(line, key) in lines"
-                    v-bind:lines="lines"
-                    v-bind:line="line"
-                    v-bind:index="key"
-                    v-bind:key="line.id"
-                    v-on:remove="removeLine(key, $event)"
-                    v-on:up="lineUp(key, $event)"
-                    v-on:down="lineDown(key, $event)">
+                    :lines="lines"
+                    :line="line"
+                    :index="key"
+                    :key="line.id"
+                    :account="account"
+                    @remove="removeLine(key, $event)"
+                    @up="lineUp(key, $event)"
+                    @down="lineDown(key, $event)">
             </sw-line>
         </transition-group>
 
