@@ -7,6 +7,9 @@ body * {
 [v-cloak] {
   display: none; }
 
+em {
+  color: inherit !important; }
+
 #navbar {
   border-bottom: none;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);

@@ -1,9 +1,9 @@
 <script type="text/x-template" id="post-template">
     <li class="post">
-        <a class="post-image open-post" href="#" :style="'background-image: url(' + (image ? 'https://steemitimages.com/400x400/' + image : '/assets/img/default-post-image.jpg') + ');'"></a>
+        <a class="post-image" @mousedown="startOpenThreshold($event)" @mouseup="open($event)" href="#" :style="'background-image: url(' + (image ? 'https://steemitimages.com/400x400/' + image : '/assets/img/default-post-image.jpg') + ');'"></a>
         <div class="post-info">
             <h3 class="uk-text-truncate uk-margin-remove">
-                <a href="#" class="open-post">{% verbatim %}{{ post.title }}{% endverbatim %}</a>
+                <a href="#" @mousedown="startOpenThreshold($event)" @mouseup="open($event)">{% verbatim %}{{ post.title }}{% endverbatim %}</a>
             </h3>
             <div class="uk-text-small uk-text-muted">
                 {% verbatim %}{{ postCreated }}{% endverbatim %}

@@ -18,8 +18,10 @@
         </transition-group>
 
         {% include 'default/add-line-modal.html.twig' %}
+        <sw-post-modal v-if="post" :post="post" :account="account"></sw-post-modal>
     </div>
 
     {% include 'default/line-template.html.twig' %}
     {% include 'default/post-template.html.twig' %}
+    {% include 'default/post-modal-template.html.twig' %}
 {% endblock %}

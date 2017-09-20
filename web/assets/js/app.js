@@ -1,18 +1,36 @@
-// Post
-Vue.component('sw-post', {
-    template: '#post-template',
+// Event Container
+let events = new Vue();
+
+// Remarkable
+let remarkable = new Remarkable({
+    html: true,
+    breaks: true,
+    linkify: false,
+    typographer: false,
+    quotes: '“”‘’'
+});
+
+// Post Mixin
+let postMixin = {
     props: ['post', 'account'],
     data: function () {
         return {
             meta: {},
             image: null,
+            tags: [],
             voting: false,
-            votingPower: 100
+            votingPower: 100,
+            cursorPosition: {x: 0, y: 0}
         }
     },
     computed: {
         postCreated: function () {
             return moment.utc(new Date(this.post.created)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss'));
+        },
+        postBody: function () {
+            return remarkable.render(this.post.body)
+                .replace(/((https?:)?\/\/?[^'"<>]+?\.(jpg|jpeg|gif|png))(?!")/ig, '<img src="$1" style="width: 100%;" />')
+                .replace(/(^http:\/\/(?:www\.)?youtube.com\/watch\?(?=[^?]*v=\w+)(?:[^\s?]+)?$)/ig, '$1 <iframe width="150" height="150" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
         },
         authorReputation: function () {
             return calculateReputation(this.post.author_reputation, 0);
@@ -32,8 +50,14 @@ Vue.component('sw-post', {
     created: function () {
         this.meta = JSON.parse(this.post.json_metadata);
 
-        if (this.meta.image) {
-            this.image = this.meta.image[0];
+        if (this.meta) {
+            if (this.meta.image) {
+                this.image = this.meta.image[0];
+            }
+
+            if (this.meta.tags) {
+                this.tags = this.meta.tags;
+            }
         }
     },
     methods: {
@@ -94,7 +118,31 @@ Vue.component('sw-post', {
                 }
             }
             return false;
+        },
+        startOpenThreshold: function ($event) {
+            this.cursorPosition.x = $event.clientX;
+            this.cursorPosition.y = $event.clientY;
+        },
+        open: function ($event) {
+            if (Math.abs(this.cursorPosition.x - $event.clientX) < 25 && Math.abs(this.cursorPosition.y - $event.clientY) < 25) {
+                events.$emit('showPost', this.post);
+            }
         }
+    }
+};
+
+// Post
+Vue.component('sw-post', {
+    template: '#post-template',
+    mixins: [postMixin]
+});
+
+// Post Modal
+Vue.component('sw-post-modal', {
+    template: '#post-modal-template',
+    mixins: [postMixin],
+    mounted: function () {
+        console.log(this.post);
     }
 });
 
@@ -302,6 +350,7 @@ let SteemLine = new Vue({
         addTrendingTag: null,
         addBlogUser: null,
         addFeedUser: null,
+        post: null
     },
     computed: {
         metaData: function () {
@@ -336,6 +385,19 @@ let SteemLine = new Vue({
         }
     },
     created: function () {
+        events.$on('showPost', (post) => {
+            this.post = post;
+            setTimeout(function () {
+                let modal = UIkit.modal('#post');
+
+                if (modal.isActive()) {
+                    modal.hide();
+                } else {
+                    modal.show();
+                }
+            }, 250);
+        });
+
         steemconnect.init({
             app: appName,
             callbackURL: redirectUri
@@ -423,26 +485,6 @@ $(document).on('focusitem.uk.slider', '.line', function (event, index) {
 
     $(this).find('.scroll-indicator').css('width', (visiblePosts / numberOfPosts * 100).toFixed(2) + '%');
     $(this).find('.scroll-indicator').css('left', ((visiblePosts / numberOfPosts * 100) * (index / visiblePosts )).toFixed(2) + '%');
-});
-
-// handling swipe and click on posts
-let cursorPosition = {};
-
-$(document).on('mousedown', '.open-post', function (e) {
-    cursorPosition.x = e.clientX;
-    cursorPosition.y = e.clientY;
-});
-
-$(document).on('mouseup', '.open-post', function (e) {
-    if (Math.abs(cursorPosition.x - e.clientX) < 25 && Math.abs(cursorPosition.y - e.clientY) < 25) {
-        let modal = UIkit.modal('#post');
-
-        if (modal.isActive()) {
-            modal.hide();
-        } else {
-            modal.show();
-        }
-    }
 });
 
 // Helper Functions
