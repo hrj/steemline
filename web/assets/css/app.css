@@ -223,6 +223,14 @@ em {
     #post .uk-modal-dialog .post-footer .post-payout {
       padding: 5px 10px;
       display: inline-block; }
+    #post .uk-modal-dialog .post-footer .user-info a {
+      color: #fff; }
+    #post .uk-modal-dialog .post-footer .user-info .post-author-reputation {
+      font-size: 12px;
+      line-height: 20px;
+      width: 20px;
+      height: 20px;
+      vertical-align: middle; }
   #post .uk-modal-dialog .post-comments {
     padding: 0 20px 20px; }
 
