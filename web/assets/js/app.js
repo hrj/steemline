@@ -76,14 +76,13 @@ let postMixin = {
             if (this.account) {
                 this.voting = true;
                 steemconnect.vote(this.account.name, this.post.author, this.post.permlink, this.votingPower * 100, (err, result) => {
-                    console.log(err, result);
                     this.voting = false;
 
                     if (!err) {
                         steem.api.getContent(this.post.author, this.post.permlink, (err, result) => {
                             this.post = result;
 
-                            UIkit.dropdown(".post-vote-dropdown").hide();
+                            UIkit.dropdown('#post-vote-dropdown-' + this.post.id).hide();
                         });
                     } else {
                         UIkit.notify({
@@ -100,14 +99,13 @@ let postMixin = {
             if (this.account) {
                 this.voting = true;
                 steemconnect.vote(this.account.name, this.post.author, this.post.permlink, 0, (err, result) => {
-                    console.log(err, result);
                     this.voting = false;
 
                     if (!err) {
                         steem.api.getContent(this.post.author, this.post.permlink, (err, result) => {
                             this.post = result;
 
-                            UIkit.dropdown(".post-vote-dropdown").hide();
+                            UIkit.dropdown('#post-vote-dropdown-' + this.post.id).hide();
                         });
                     } else {
                         UIkit.notify({

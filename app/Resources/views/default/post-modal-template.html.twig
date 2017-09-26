@@ -20,7 +20,7 @@
             <div class="post-footer">
                 <div class="uk-text-center uk-text-large">
                     <div class="uk-margin-bottom">
-                        <div class="uk-button-dropdown post-vote-dropdown" data-uk-dropdown="{mode: 'click', pos:'top-center'}" style="vertical-align: top;">
+                        <div :class="'uk-button-dropdown post-vote-dropdown post-vote-dropdown-' + post.id" data-uk-dropdown="{mode: 'click', pos:'top-center'}" style="vertical-align: top;">
                             <a href="#" :class="'post-vote-link'  + (isUpvoted() ? ' upvoted' : '')">
                                 <i class="uk-icon-angle-up"></i>
                                 {% verbatim %}{{ post.net_votes }}{% endverbatim %} votes

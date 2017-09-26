@@ -16,7 +16,7 @@
                     $ {% verbatim %}{{ payout }}{% endverbatim %}
                 </div>
                 <div class="uk-width-1-3">
-                    <div class="uk-button-dropdown post-vote-dropdown" data-uk-dropdown="{mode: 'click', pos:'top-center'}" style="vertical-align: top;">
+                    <div :class="'uk-button-dropdown post-vote-dropdown post-vote-dropdown-' + post.id" data-uk-dropdown="{mode: 'click', pos:'top-center'}" style="vertical-align: top;">
                         <a href="#" :class="'post-vote-link'  + (isUpvoted() ? ' upvoted' : '')"><i class="uk-icon-angle-up"></i> {% verbatim %}{{ post.net_votes }}{% endverbatim %}</a>
                         <div class="uk-dropdown-blank uk-panel uk-panel-box post-vote-box">
                             <div v-if="account">
