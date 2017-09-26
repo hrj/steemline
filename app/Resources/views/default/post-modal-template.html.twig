@@ -1,5 +1,5 @@
 <script type="text/x-template" id="post-modal-template">
-    <div id="post" class="uk-modal">
+    <div id="post" class="uk-modal" v-if="post">
         <div class="uk-modal-dialog">
             <a class="uk-modal-close uk-close"></a>
             <div class="uk-modal-header">
@@ -62,6 +62,7 @@
                         </span>
                     </div>
                     <div class="user-info">
+                        <div v-if="profileMeta.profile_image" class="post-author-avatar" :style="'background-image: url(https://steemitimages.com/100x100/' + profileMeta.profile_image + ');'"></div>
                         <a :href="'https://steemit.com/@' + post.author" class="post-author">{% verbatim %}{{ post.author }}{% endverbatim %}</a>
                         <span class="post-author-reputation">{% verbatim %}{{ authorReputation }}{% endverbatim %}</span>
                     </div>
@@ -78,57 +79,14 @@
             </h3>
             <hr>
             <div class="post-comments">
-                <ul class="uk-comment-list">
-                    <li>
-                        <article class="uk-comment post-comment">
-                            <header class="uk-comment-header">
-                                <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
-                                <h4 class="uk-comment-title">
-                                    Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
-                                </h4>
-                                <ul class="uk-comment-meta uk-subnav uk-subnav-line">
-                                    <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
-                                    <li>$ 0.01</li>
-                                    <li>1 vote</li>
-                                    <li><a href="#">reply</a></li>
-                                </ul>
-                            </header>
-                        </article>
-                        <ul>
-                            <li>
-                                <article class="uk-comment post-comment">
-                                    <header class="uk-comment-header">
-                                        <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
-                                        <h4 class="uk-comment-title">
-                                            Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
-                                        </h4>
-                                        <ul class="uk-comment-meta uk-subnav uk-subnav-line">
-                                            <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
-                                            <li>$ 0.01</li>
-                                            <li>1 vote</li>
-                                            <li><a href="#">reply</a></li>
-                                        </ul>
-                                    </header>
-                                </article>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <article class="uk-comment post-comment">
-                            <header class="uk-comment-header">
-                                <img class="uk-comment-avatar" src="https://getuikit.com/v2/docs/images/placeholder_avatar.svg" alt="">
-                                <h4 class="uk-comment-title">
-                                    Totam laudantium nemo dolorem enim ut et. Veniam blanditiis nesciunt quas vel rem iste. Quasi ipsam repellendus dicta quia illum tempora consequatur cum.
-                                </h4>
-                                <ul class="uk-comment-meta uk-subnav uk-subnav-line">
-                                    <li>by <a href="#">mkt</a> <span class="comment-author-reputation">55</span></li>
-                                    <li>$ 0.01</li>
-                                    <li>1 vote</li>
-                                    <li><a href="#">reply</a></li>
-                                </ul>
-                            </header>
-                        </article>
-                    </li>
+                <div v-if="repliesLoading" class="uk-text-center"><i class="uk-icon-spin uk-icon-spinner"></i></div>
+                <ul v-if="replies.length" class="uk-comment-list">
+                    <sw-reply
+                        v-for="reply in replies"
+                        :key="reply.id"
+                        :post="reply"
+                        :account="account"
+                    ></sw-reply>
                 </ul>
             </div>
         </div>

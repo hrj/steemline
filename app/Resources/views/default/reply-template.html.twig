@@ -1,0 +1,29 @@
+<script type="text/x-template" id="reply-template">
+    <li class="reply">
+        <article class="uk-comment post-comment">
+            <header class="uk-comment-header">
+                <div class="uk-comment-avatar" :style="'background-image: url(' + (profileMeta.profile_image ? 'https://steemitimages.com/100x100/' + profileMeta.profile_image : 'https://getuikit.com/v2/docs/images/placeholder_avatar.svg') + ');'"></div>
+                <ul class="uk-comment-meta uk-subnav uk-subnav-line">
+                    <li class="uk-padding-remove">
+                        <a href="#" class="uk-text-bold uk-text-primary">{% verbatim %}{{ post.author }}{% endverbatim %}</a>
+                        <span class="comment-author-reputation">{% verbatim %}{{ authorReputation }}{% endverbatim %}</span>
+                    </li>
+                </ul>
+                <h4 class="uk-comment-title"  v-html="postBody"></h4>
+                <ul class="uk-comment-meta uk-subnav uk-subnav-line uk-float-right">
+                    <li>$ {% verbatim %}{{ payout }}{% endverbatim %}</li>
+                    <li>{% verbatim %}{{ post.net_votes }}{% endverbatim %} votes</li>
+                    <li><a href="#">reply</a></li>
+                </ul>
+            </header>
+        </article>
+        <ul v-if="post.replies.length">
+            <sw-reply
+                    v-for="reply in post.replies"
+                    :key="reply.id"
+                    :post="reply"
+                    :account="account"
+            ></sw-reply>
+        </ul>
+    </li>
+</script>

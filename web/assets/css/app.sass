@@ -249,6 +249,14 @@ em
       .user-info
         a
           color: #fff
+        .post-author-avatar
+          width: 50px
+          height: 50px
+          background-size: cover
+          background-position: center center
+          margin: 0 auto 10px
+          border-radius: 50%
+          border: solid 1px #eee
         .post-author-reputation
           font-size: 12px
           line-height: 20px
@@ -258,6 +266,39 @@ em
 
     .post-comments
       padding: 0 20px 20px
+      .uk-comment-list
+        > .reply
+          border-bottom: solid 1px #ccc
+          padding-bottom: 25px
+          margin-bottom: 25px
+          &:last-child
+            border-bottom: none
+            padding-bottom: 0
+            margin-bottom: 0
+        .reply
+          .uk-comment
+            + ul
+              padding-left: 50px
+
+            .uk-comment-meta
+              font-size: 15px
+
+            .uk-comment-avatar
+              width: 50px
+              height: 50px
+              background-position: center center
+              background-size: cover
+              border-radius: 50%
+              border: solid 1px #eee
+            .comment-author-reputation
+              border: solid 1px #ccc
+              border-radius: 50%
+              font-size: 10px
+              width: 16px
+              height: 16px
+              display: inline-block
+              text-align: center
+              line-height: 16px
 
 /**
  * Media Queries

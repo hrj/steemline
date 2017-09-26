@@ -16,11 +16,14 @@ let postMixin = {
     data: function () {
         return {
             meta: {},
+            profileMeta: {},
             image: null,
             tags: [],
             voting: false,
             votingPower: 100,
-            cursorPosition: {x: 0, y: 0}
+            cursorPosition: {x: 0, y: 0},
+            replies: {},
+            repliesLoading: false
         }
     },
     computed: {
@@ -48,17 +51,25 @@ let postMixin = {
         }
     },
     created: function () {
-        this.meta = JSON.parse(this.post.json_metadata);
+        if (this.post.json_metadata) {
+            this.meta = JSON.parse(this.post.json_metadata);
 
-        if (this.meta) {
-            if (this.meta.image) {
-                this.image = this.meta.image[0];
-            }
+            if (this.meta) {
+                if (this.meta.image) {
+                    this.image = this.meta.image[0];
+                }
 
-            if (this.meta.tags) {
-                this.tags = this.meta.tags;
+                if (this.meta.tags) {
+                    this.tags = this.meta.tags;
+                }
             }
         }
+
+        steem.api.getAccounts([this.post.author], (err, response) => {
+            if (!err && response.length && response[0].json_metadata) {
+                this.profileMeta = JSON.parse(response[0].json_metadata).profile;
+            }
+        });
     },
     methods: {
         vote: function () {
@@ -118,7 +129,15 @@ let postMixin = {
                 }
             }
             return false;
-        },
+        }
+    }
+};
+
+// Post
+Vue.component('sw-post', {
+    template: '#post-template',
+    mixins: [postMixin],
+    methods: {
         startOpenThreshold: function ($event) {
             this.cursorPosition.x = $event.clientX;
             this.cursorPosition.y = $event.clientY;
@@ -129,21 +148,44 @@ let postMixin = {
             }
         }
     }
-};
-
-// Post
-Vue.component('sw-post', {
-    template: '#post-template',
-    mixins: [postMixin]
 });
 
 // Post Modal
 Vue.component('sw-post-modal', {
     template: '#post-modal-template',
     mixins: [postMixin],
+    methods: {
+        fetchReplies: function (author, permlink) {
+            return steem.api.getContentReplies(author, permlink)
+                .then((replies) => {
+                    return Promise.map(replies, (r) => {
+                        if (r.children > 0) {
+                            return this.fetchReplies(r.author, r.permlink)
+                                .then((children) => {
+                                    r.replies = children;
+                                    return r;
+                                })
+                        } else {
+                            return r;
+                        }
+                    });
+                });
+        },
+    },
     mounted: function () {
-        console.log(this.post);
+        this.repliesLoading = true;
+        this.fetchReplies(this.post.author, this.post.permlink)
+            .then((comments) => {
+                this.replies = comments;
+                this.repliesLoading = false;
+            });
     }
+});
+
+// Reply
+Vue.component('sw-reply', {
+    template: '#reply-template',
+    mixins: [postMixin]
 });
 
 // Line
@@ -350,7 +392,8 @@ let SteemLine = new Vue({
         addTrendingTag: null,
         addBlogUser: null,
         addFeedUser: null,
-        post: null
+        post: null,
+        postModal: null
     },
     computed: {
         metaData: function () {
@@ -387,15 +430,14 @@ let SteemLine = new Vue({
     created: function () {
         events.$on('showPost', (post) => {
             this.post = post;
-            setTimeout(function () {
-                let modal = UIkit.modal('#post');
-
-                if (modal.isActive()) {
-                    modal.hide();
-                } else {
-                    modal.show();
-                }
+            setTimeout(() => {
+                this.postModal = UIkit.modal('#post');
+                this.postModal.show();
             }, 250);
+        });
+
+        $(document).on('hide.uk.modal', '#post', () => {
+            this.post = this.postModal = null;
         });
 
         steemconnect.init({
