@@ -2,7 +2,8 @@ html {
   background: #666; }
 
 body * {
-  font-family: "Cairo", sans-serif; }
+  font-family: "Cairo", sans-serif;
+  outline: none; }
 
 [v-cloak] {
   display: none; }
