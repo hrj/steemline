@@ -371,6 +371,8 @@ let SteemLine = new Vue({
     data: {
         connecting: true,
         account: null,
+        mentions: null,
+        newMentions: 0,
         lines: [],
         defaultLines: [
             {
@@ -425,7 +427,32 @@ let SteemLine = new Vue({
             return calculateVotingPower(this.account.voting_power, this.account.last_vote_time, 2);
         }
     },
-    created: function () {
+    created: function () {steemconnect.init({
+            app: appName,
+            callbackURL: redirectUri
+        });
+
+        steemconnect.isAuthenticated((error, auth) => {
+            if (!error && auth.isAuthenticated) {
+                steem.api.getAccounts([auth.username], (error, accounts) => {
+                    this.account = accounts[0];
+                    this.connecting = false;
+
+                    this.updateMentions();
+
+                    setInterval(this.updateAccount, 30000);
+                });
+            } else {
+                this.connecting = false;
+            }
+        });
+
+        if (loadFromLocalStorage('lines')) {
+            this.lines = loadFromLocalStorage('lines');
+        } else {
+            this.lines = this.defaultLines;
+        }
+
         events.$on('showPost', (post) => {
             this.post = post;
             setTimeout(() => {
@@ -438,29 +465,9 @@ let SteemLine = new Vue({
             this.post = this.postModal = null;
         });
 
-        steemconnect.init({
-            app: appName,
-            callbackURL: redirectUri
+        $(document).on('hide.uk.modal', '#mentions', () => {
+            this.newMentions = 0;
         });
-
-        steemconnect.isAuthenticated((error, auth) => {
-            if (!error && auth.isAuthenticated) {
-                steem.api.getAccounts([auth.username], (error, accounts) => {
-                    this.account = accounts[0];
-                    this.connecting = false;
-
-                    setInterval(this.updateAccount, 10000);
-                });
-            } else {
-                this.connecting = false;
-            }
-        });
-
-        if (loadFromLocalStorage('lines')) {
-            this.lines = loadFromLocalStorage('lines');
-        } else {
-            this.lines = this.defaultLines;
-        }
     },
     methods: {
         updateAccount: function () {
@@ -470,6 +477,16 @@ let SteemLine = new Vue({
                  * Upvote a post, see the state change and then flip back again once this line is executed.
                  */
                 this.account = accounts[0];
+
+                this.updateMentions();
+            });
+        },
+        updateMentions: function () {
+            $.getJSON('http://api.comprendre-steem.fr/getMentions?username=' + this.account.name, (response) => {
+                if (this.mentions != null && response.size > this.mentions.length) {
+                    this.newMentions += response.size - this.mentions.length
+                }
+                this.mentions = response.mentions;
             });
         },
         removeLine: function (key, $event) {
@@ -530,9 +547,13 @@ $(document).on('focusitem.uk.slider', '.line', function (event, index) {
 // Helper Functions
 
 function calculateReputation(reputation, precision) {
-    let score = parseFloat((reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25));
+    if (reputation) {
+        let score = parseFloat((reputation < 0 ? '-' : '') + ((((Math.log10(Math.abs(reputation))) - 9) * 9) + 25));
 
-    return precision ? score.toFixed(precision) : Math.floor(score);
+        return precision ? score.toFixed(precision) : Math.floor(score);
+    }
+
+    return 25;
 }
 
 function calculateVotingPower(votingPower, lastVoteTime, precision) {

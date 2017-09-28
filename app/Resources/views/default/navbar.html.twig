@@ -30,6 +30,11 @@
         </li>
     </ul>
     <ul class="uk-navbar-nav uk-navbar-flip" v-if="account && !connecting">
+        <li v-if="newMentions > 0">
+            <span class="uk-badge uk-badge-notification">
+                {% verbatim %}{{ newMentions }}%{% endverbatim %}
+            </span>
+        </li>
         <li v-if="profileImage">
             <a href="#sidebar" data-uk-offcanvas="{mode:'slide'}">
                 <span class="profile-image" :style="'background-image: url(https://steemitimages.com/50x50/' + profileImage + ')'"></span>
@@ -80,6 +85,13 @@
 
         <ul class="uk-nav uk-nav-offcanvas" data-uk-nav>
             <li>
+                <a href="#mentions" data-uk-modal>
+                    <i class="uk-icon-quote-right"></i>
+                    Mentions
+                    <span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>
+                </a>
+            </li>
+            <li>
                 <a href="https://steemconnect.com/logout">
                     <i class="uk-icon-sign-out"></i>
                     Logout
@@ -111,5 +123,31 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="mentions" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <div class="uk-modal-header">
+            <h3>Posts and comments mentioning you</h3>
+        </div>
+        <p v-if="!mentions || mentions.length == 0" class="uk-text-center">
+            You haven't been mentioned yet.
+        </p>
+        <article class="uk-comment" v-for="(mention, key) in mentions" :key="key">
+            <header class="uk-comment-header">
+                <h4 class="uk-comment-title">
+                    <a :href="'https://steemit.com/' + mention.permlink">
+                        {% verbatim %}{{ mention.title }}{% endverbatim %}
+                    </a>
+                </h4>
+                <div class="uk-comment-meta">
+                    {% verbatim %}{{ mention.author }}{% endverbatim %}
+                    |
+                    {% verbatim %}{{ mention.created }}{% endverbatim %}
+                </div>
+            </header>
+        </article>
     </div>
 </div>
