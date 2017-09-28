@@ -427,7 +427,8 @@ let SteemLine = new Vue({
             return calculateVotingPower(this.account.voting_power, this.account.last_vote_time, 2);
         }
     },
-    created: function () {steemconnect.init({
+    created: function () {
+        steemconnect.init({
             app: appName,
             callbackURL: redirectUri
         });
