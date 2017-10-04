@@ -16,4 +16,5 @@ Multifeed, Statistics and Notifications for Steem!
 - After up- or unvoting the voting box of all posts opens on hover
 - Clicking the upvote button of a post far to the right (last 3 or sth.) the slider will scroll back to the first post on the left.
 - Unfocussing the vote percentage dropdown makes the slider scroll right.
+- Dragging doesn't work correclty in firefox.
 - ...
