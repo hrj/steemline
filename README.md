@@ -5,6 +5,7 @@ Multifeed, Statistics and Notifications for Steem!
 # Planned Features
 
 - Notifications for incoming votes, replies and mentions
+- Follow/Unfollow
 - Scheduled Posting
 - Voting Bot
 
