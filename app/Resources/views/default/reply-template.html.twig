@@ -72,9 +72,9 @@
                 </form>
             </div>
         </article>
-        <ul v-if="post.replies.length">
+        <ul v-if="replies.length">
             <sw-reply
-                    v-for="reply in post.replies"
+                    v-for="reply in replies"
                     :key="reply.id"
                     :post="reply"
                     :account="account"

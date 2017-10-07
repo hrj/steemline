@@ -144,18 +144,14 @@ let postMixin = {
                         this.showReplyTextarea = false;
                         this.repliesLoading = true;
                         this.replies = {};
-                        this.fetchReplies(this.post.author, this.post.permlink)
-                            .then((comments) => {
-                                this.replies = comments;
-                                this.repliesLoading = false;
-                                setTimeout(() => {
-                                    let newReply = $('#' + replyPermlink);
-                                    if (newReply.length) {
-                                        window.location.hash = '#' + replyPermlink;
-                                        newReply.effect("highlight", {}, 2000);
-                                    }
-                                }, 1000);
-                            });
+                        this.fetchReplies(this.post.author, this.post.permlink);
+                        setTimeout(() => {
+                            let newReply = $('#' + replyPermlink);
+                            if (newReply.length) {
+                                window.location.hash = '#' + replyPermlink;
+                                newReply.effect("highlight", {}, 2000);
+                            }
+                        }, 1000);
                     } else {
                         UIkit.notify({
                             message : 'Error: Comment not sent due to an unexpected error!',
@@ -171,20 +167,12 @@ let postMixin = {
             $(e.target).parent().find('.preview').html(remarkable.render(e.target.value));
         },
         fetchReplies: function (author, permlink) {
-            return steem.api.getContentReplies(author, permlink)
-                .then((replies) => {
-                    return Promise.map(replies, (r) => {
-                        if (r.children > 0) {
-                            return this.fetchReplies(r.author, r.permlink)
-                                .then((children) => {
-                                    r.replies = children;
-                                    return r;
-                                })
-                        } else {
-                            return r;
-                        }
-                    });
-                });
+            return steem.api.getContentReplies(author, permlink, (err, result) => {
+                if (!err) {
+                    this.replies = result;
+                }
+                this.repliesLoading = false;
+            });
         }
     }
 };
@@ -212,18 +200,18 @@ Vue.component('sw-post-modal', {
     mixins: [postMixin],
     mounted: function () {
         this.repliesLoading = true;
-        this.fetchReplies(this.post.author, this.post.permlink)
-            .then((comments) => {
-                this.replies = comments;
-                this.repliesLoading = false;
-            });
+        this.fetchReplies(this.post.author, this.post.permlink);
     }
 });
 
 // Reply
 Vue.component('sw-reply', {
     template: '#reply-template',
-    mixins: [postMixin]
+    mixins: [postMixin],
+    mounted: function () {
+        this.repliesLoading = true;
+        this.fetchReplies(this.post.author, this.post.permlink);
+    }
 });
 
 // Line
