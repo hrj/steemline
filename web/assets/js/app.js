@@ -23,7 +23,9 @@ let postMixin = {
             votingPower: 100,
             cursorPosition: {x: 0, y: 0},
             replies: {},
-            repliesLoading: false
+            repliesLoading: false,
+            showReplyTextarea: false,
+            replying: false
         }
     },
     computed: {
@@ -127,6 +129,62 @@ let postMixin = {
                 }
             }
             return false;
+        },
+        submitReply: function (e) {
+            e.preventDefault();
+            if (this.account) {
+                this.replying = true;
+                let replyTextarea = $(e.target).find('.reply-textarea');
+                let reply = replyTextarea.val();
+                let date = new Date();
+                let replyPermlink = 're-' + this.post.author + '-' + this.post.permlink + '-' + date.toISOString().replace(/[.:-]/g, '').toLowerCase();
+                steemconnect.comment(this.post.author, this.post.permlink, this.account.name, replyPermlink, null, reply, null, (err, result) => {
+                    this.replying = false;
+                    if (!err) {
+                        this.showReplyTextarea = false;
+                        this.repliesLoading = true;
+                        this.replies = {};
+                        this.fetchReplies(this.post.author, this.post.permlink)
+                            .then((comments) => {
+                                this.replies = comments;
+                                this.repliesLoading = false;
+                                setTimeout(() => {
+                                    let newReply = $('#' + replyPermlink);
+                                    if (newReply.length) {
+                                        window.location.hash = '#' + replyPermlink;
+                                        newReply.effect("highlight", {}, 2000);
+                                    }
+                                }, 1000);
+                            });
+                    } else {
+                        UIkit.notify({
+                            message : 'Error: Comment not sent due to an unexpected error!',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos     : 'top-center'
+                        });
+                    }
+                });
+            }
+        },
+        renderReply: function (e) {
+            $(e.target).parent().find('.preview').html(remarkable.render(e.target.value));
+        },
+        fetchReplies: function (author, permlink) {
+            return steem.api.getContentReplies(author, permlink)
+                .then((replies) => {
+                    return Promise.map(replies, (r) => {
+                        if (r.children > 0) {
+                            return this.fetchReplies(r.author, r.permlink)
+                                .then((children) => {
+                                    r.replies = children;
+                                    return r;
+                                })
+                        } else {
+                            return r;
+                        }
+                    });
+                });
         }
     }
 };
@@ -152,24 +210,6 @@ Vue.component('sw-post', {
 Vue.component('sw-post-modal', {
     template: '#post-modal-template',
     mixins: [postMixin],
-    methods: {
-        fetchReplies: function (author, permlink) {
-            return steem.api.getContentReplies(author, permlink)
-                .then((replies) => {
-                    return Promise.map(replies, (r) => {
-                        if (r.children > 0) {
-                            return this.fetchReplies(r.author, r.permlink)
-                                .then((children) => {
-                                    r.replies = children;
-                                    return r;
-                                })
-                        } else {
-                            return r;
-                        }
-                    });
-                });
-        },
-    },
     mounted: function () {
         this.repliesLoading = true;
         this.fetchReplies(this.post.author, this.post.permlink)

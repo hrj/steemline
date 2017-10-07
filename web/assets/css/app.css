@@ -166,11 +166,13 @@ em {
   color: #999;
   display: block;
   height: 30px;
+  line-height: 30px;
   padding: 0 10px;
   transition: background 0.3s ease, color 0.3s ease; }
   .post-vote-link:hover, .post-vote-link.upvoted {
     background: #00a8e6;
-    color: #fff; }
+    color: #fff;
+    text-decoration: none; }
 
 .post-vote-box {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); }
@@ -255,7 +257,8 @@ em {
     #post .uk-modal-dialog .post-comments .uk-comment-list .reply .uk-comment + ul {
       padding-left: 50px; }
     #post .uk-modal-dialog .post-comments .uk-comment-list .reply .uk-comment .uk-comment-meta {
-      font-size: 15px; }
+      font-size: 15px;
+      line-height: 30px; }
     #post .uk-modal-dialog .post-comments .uk-comment-list .reply .uk-comment .uk-comment-avatar {
       width: 50px;
       height: 50px;
@@ -272,6 +275,14 @@ em {
       display: inline-block;
       text-align: center;
       line-height: 16px; }
+
+.reply-textarea {
+  background: #fff;
+  color: #666;
+  border: solid 1px #ccc;
+  width: 100%;
+  font-size: 16px;
+  line-height: 23px; }
 
 /**
  * Media Queries
