@@ -7,7 +7,9 @@ Multifeed, Statistics and Notifications for Steem!
 - Notifications for incoming votes, replies and mentions
 - Follow/Unfollow
 - Scheduled Posting
+- Uploading images
 - Voting Bot
+- Profile/Follow Popups on usernames (also mentions in posts/comments)
 
 # Known Bugs
 
