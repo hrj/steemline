@@ -33,9 +33,7 @@ let postMixin = {
             return moment.utc(new Date(this.post.created)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss'));
         },
         postBody: function () {
-            return remarkable.render(this.post.body)
-                .replace(/((https?:)?\/\/?[^'"<>]+?\.(jpg|jpeg|gif|png))(?!")/ig, '<img src="$1" style="width: 100%;" />')
-                .replace(/(^http:\/\/(?:www\.)?youtube.com\/watch\?(?=[^?]*v=\w+)(?:[^\s?]+)?$)/ig, '$1 <iframe width="150" height="150" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+            return replaceMedia(remarkable.render(this.post.body));
         },
         authorReputation: function () {
             return calculateReputation(this.post.author_reputation, 0);
@@ -421,7 +419,12 @@ let SteemLine = new Vue({
         addBlogUser: null,
         addFeedUser: null,
         post: null,
-        postModal: null
+        postModal: null,
+        currentDraft: '',
+        currentDraftTitle: '',
+        currentDraftTags: '',
+        saveDraftTimeout: null,
+        submitting: false
     },
     computed: {
         metaData: function () {
@@ -469,7 +472,7 @@ let SteemLine = new Vue({
 
                     this.updateMentions();
 
-                    setInterval(this.updateAccount, 30000);
+                    setInterval(this.updateAccount, 5000);
                 });
             } else {
                 this.connecting = false;
@@ -480,6 +483,16 @@ let SteemLine = new Vue({
             this.lines = loadFromLocalStorage('lines');
         } else {
             this.lines = this.defaultLines;
+        }
+
+        if (loadFromLocalStorage('currentDraft')) {
+            this.currentDraft = loadFromLocalStorage('currentDraft');
+        }
+        if (loadFromLocalStorage('currentDraftTitle')) {
+            this.currentDraftTitle = loadFromLocalStorage('currentDraftTitle');
+        }
+        if (loadFromLocalStorage('currentDraftTags')) {
+            this.currentDraftTags = loadFromLocalStorage('currentDraftTags');
         }
 
         events.$on('showPost', (post) => {
@@ -511,7 +524,7 @@ let SteemLine = new Vue({
             });
         },
         updateMentions: function () {
-            $.getJSON('http://api.comprendre-steem.fr/getMentions?username=' + this.account.name, (response) => {
+            $.getJSON('http://api.comprendre-steem.fr/getMentions?comments=Y&own_comments=Y&username=' + this.account.name, (response) => {
                 if (this.mentions != null && response.size > this.mentions.length) {
                     this.newMentions += response.size - this.mentions.length
                 }
@@ -560,6 +573,50 @@ let SteemLine = new Vue({
                     break;
             }
             saveToLocalStorage('lines', this.lines);
+        },
+        saveCurrentDraft: function () {
+            if (this.saveDraftTimeout) {
+                clearTimeout(this.saveDraftTimeout);
+            }
+
+            this.saveDraftTimeout = setTimeout(() => {
+                saveToLocalStorage('currentDraft', this.currentDraft);
+                saveToLocalStorage('currentDraftTitle', this.currentDraftTitle);
+                saveToLocalStorage('currentDraftTags', this.currentDraftTags);
+            }, 2000);
+        },
+        renderedDraft: function () {
+            return replaceMedia(remarkable.render($('#submit-story-body').val()));
+        },
+        submitStory: function (e) {
+            e.preventDefault();
+            this.submitting = true;
+            let tags = this.currentDraftTags.toLowerCase().split(' ');
+            let metaData = {tags: tags, app: 'steemline/beta'};
+            let permlink = slugify(this.currentDraftTitle);
+            if (permlink.length > 256) {
+                permlink = permlink.substr(0, 255);
+            }
+
+            steemconnect.comment(null, tags[0], this.account.name, permlink, this.currentDraftTitle, this.currentDraft, JSON.stringify(metaData), (err, result) => {
+                if (!err) {
+                    this.currentDraft = '';
+                    this.currentDraftTitle = '';
+                    this.currentDraftTags = '';
+                    saveToLocalStorage('currentDraft', '');
+                    saveToLocalStorage('currentDraftTitle', '');
+                    saveToLocalStorage('currentDraftTags', '');
+                    UIkit.modal("#submit-story").hide();
+                } else {
+                    UIkit.notify({
+                        message : 'Error: Post not sent due to an unexpected error!',
+                        status  : 'danger',
+                        timeout : 5000,
+                        pos     : 'top-center'
+                    });
+                }
+                this.submitting = false;
+            });
         }
     }
 });
@@ -602,4 +659,27 @@ function loadFromLocalStorage(key) {
     if (typeof(Storage) !== "undefined") {
         return JSON.parse(localStorage.getItem(key));
     }
+}
+
+function replaceMedia(body) {
+    return body
+        .replace(/((https?:)?\/\/?[^'"<>]+?\.(jpg|jpeg|gif|png))(?!")/ig, '<img src="$1" style="width: 100%;" />')
+        .replace(/(^http:\/\/(?:www\.)?youtube.com\/watch\?(?=[^?]*v=\w+)(?:[^\s?]+)?$)/ig, '$1 <iframe width="150" height="150" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>')
+        ;
+}
+
+function slugify (title) {
+    const a = 'àáäâèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;';
+    const b = 'aaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------';
+    const p = new RegExp(a.split('').join('|'), 'g');
+
+    return title.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(p, c =>
+            b.charAt(a.indexOf(c)))     // Replace special chars
+        .replace(/&/g, '-and-')         // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '')             // Trim - from end of text
 }

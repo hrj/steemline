@@ -12,7 +12,7 @@
             </a>
         </li>
         <li v-if="account">
-            <a href="#" class="navbar-primary-button">
+            <a href="#submit-story" class="navbar-primary-button" data-uk-modal>
                 <i class="uk-icon-pencil"></i>
                 <span class="uk-hidden-small">Submit Story</span>
             </a>
@@ -31,9 +31,12 @@
     </ul>
     <ul class="uk-navbar-nav uk-navbar-flip" v-if="account && !connecting">
         <li v-if="newMentions > 0">
-            <span class="uk-badge uk-badge-notification">
-                {% verbatim %}{{ newMentions }}%{% endverbatim %}
-            </span>
+            <a href="#mentions" data-uk-modal data-uk-tooltip :title="newMentions + ' new mention' + (newMentions > 1 ? 's' : '')">
+                <i class="uk-icon-bell"></i>
+                <span class="uk-badge uk-badge-notification">
+                    {% verbatim %}{{ newMentions }}{% endverbatim %}
+                </span>
+            </a>
         </li>
         <li v-if="profileImage">
             <a href="#sidebar" data-uk-offcanvas="{mode:'slide'}">

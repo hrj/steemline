@@ -1,0 +1,42 @@
+<div id="submit-story" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <div class="uk-modal-header">
+            <h3>Submit Story</h3>
+        </div>
+        <form class="uk-form uk-form-stacked" @submit="submitStory($event)">
+            <div class="uk-form-row">
+                <input type="text" v-model="currentDraftTitle" @keyup="saveCurrentDraft" @change="saveCurrentDraft" id="submit-story-title" placeholder="Title" class="uk-width-1-1 uk-form-large">
+            </div>
+            <div class="uk-form-row">
+                <ul class="uk-tab" data-uk-tab="{connect:'#editor-preview'}">
+                    <li class="uk-active"><a href="">Editor</a></li>
+                    <li><a href="">Preview</a></li>
+                </ul>
+                <ul id="editor-preview" class="uk-switcher">
+                    <li>
+                        <textarea id="submit-story-body" v-model="currentDraft" @keyup="saveCurrentDraft" @change="saveCurrentDraft" placeholder="Your story..." class="uk-width-1-1 uk-form-large"></textarea>
+                    </li>
+                    <li>
+                        <div v-html="renderedDraft()" class="uk-margin-top"></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="uk-form-row">
+                <label for="submit-story-tags" class="uk-form-label">Tags:</label>
+                <input type="text" id="submit-story-tags" placeholder="Tags" class="uk-width-1-1" v-model="currentDraftTags" @keyup="saveCurrentDraft" @change="saveCurrentDraft">
+            </div>
+            <div class="uk-form-row uk-text-right">
+                <button v-if="currentDraft.length && currentDraftTitle.length && currentDraftTags.length" class="uk-button uk-button-primary">
+                    <i v-if="!submitting" class="uk-icon-send"></i>
+                    <i v-if="submitting" class="uk-icon-spin uk-icon-spinner"></i>
+                    send
+                </button>
+                <button v-if="!currentDraft.length || !currentDraftTitle.length || !currentDraftTags.length" class="uk-button uk-button-primary" disabled>
+                    <i class="uk-icon-send"></i>
+                    send
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
