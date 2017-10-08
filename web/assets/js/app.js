@@ -86,7 +86,7 @@ let postMixin = {
                         });
                     } else {
                         UIkit.notify({
-                            message : 'Error: Maximum allowed changes exceeded!',
+                            message : '<b>Error</b>: Maximum allowed changes exceeded!',
                             status  : 'danger',
                             timeout : 5000,
                             pos     : 'top-center'
@@ -152,7 +152,7 @@ let postMixin = {
                         }, 1000);
                     } else {
                         UIkit.notify({
-                            message : 'Error: Comment not sent due to an unexpected error!',
+                            message : 'Error: Comment not sent due to an unexpected error! Try again later.',
                             status  : 'danger',
                             timeout : 5000,
                             pos     : 'top-center'
@@ -607,9 +607,15 @@ let SteemLine = new Vue({
                     saveToLocalStorage('currentDraftTitle', '');
                     saveToLocalStorage('currentDraftTags', '');
                     UIkit.modal("#submit-story").hide();
+
+                    steem.api.getContent(this.account.name, permlink, (err, result) => {
+                        if (!err) {
+                            events.$emit('showPost', result);
+                        }
+                    });
                 } else {
                     UIkit.notify({
-                        message : 'Error: Post not sent due to an unexpected error!',
+                        message : 'Error: Post not sent due to an unexpected error! Try again later.',
                         status  : 'danger',
                         timeout : 5000,
                         pos     : 'top-center'
