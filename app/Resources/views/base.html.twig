@@ -28,8 +28,11 @@
 {% block body %}{% endblock %}
 {% block javascripts %}
     <script>
-        let redirectUri = '{{ app.request.uri }}';
-        let appName = '{{ app_name }}';
+        let sf = {
+            appName: '{{ app_name }}',
+            redirectUri: '{{ app.request.uri }}',
+            host: '{{ url('homepage') }}'
+        };
     </script>
     {% javascripts
     'assets/vendor/jquery/dist/jquery.min.js'

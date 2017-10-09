@@ -460,8 +460,8 @@ let SteemLine = new Vue({
     },
     created: function () {
         steemconnect.init({
-            app: appName,
-            callbackURL: redirectUri
+            app: sf.appName,
+            callbackURL: sf.redirectUri
         });
 
         steemconnect.isAuthenticated((error, auth) => {
@@ -472,7 +472,7 @@ let SteemLine = new Vue({
 
                     this.updateMentions();
 
-                    setInterval(this.updateAccount, 5000);
+                    setInterval(this.updateAccount, 60000);
                 });
             } else {
                 this.connecting = false;
@@ -524,7 +524,7 @@ let SteemLine = new Vue({
             });
         },
         updateMentions: function () {
-            $.getJSON('http://api.comprendre-steem.fr/getMentions?comments=Y&own_comments=Y&username=' + this.account.name, (response) => {
+            $.getJSON(sf.host + 'api/mentions?comments=Y&own=Y&username=' + this.account.name, (response) => {
                 if (this.mentions != null && response.size > this.mentions.length) {
                     this.newMentions += response.size - this.mentions.length
                 }
