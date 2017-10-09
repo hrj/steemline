@@ -8,16 +8,16 @@
 
 namespace AppBundle\Service;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class SteemClient
 {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $em;
 
-    function __construct(EntityManager $em) {
+    function __construct(EntityManagerInterface $em) {
 
         $this->em = $em;
     }
