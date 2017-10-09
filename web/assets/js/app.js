@@ -398,6 +398,7 @@ let SteemLine = new Vue({
         connecting: true,
         account: null,
         mentions: null,
+        followers: null,
         newMentions: 0,
         lines: [],
         defaultLines: [
@@ -471,6 +472,7 @@ let SteemLine = new Vue({
                     this.connecting = false;
 
                     this.updateMentions();
+                    this.updateFollowers();
 
                     setInterval(this.updateAccount, 60000);
                 });
@@ -521,15 +523,27 @@ let SteemLine = new Vue({
                 this.account = accounts[0];
 
                 this.updateMentions();
+                this.updateFollowers();
             });
         },
         updateMentions: function () {
-            $.getJSON(sf.host + 'api/mentions?comments=Y&own=Y&username=' + this.account.name, (response) => {
-                if (this.mentions != null && response.size > this.mentions.length) {
-                    this.newMentions += response.size - this.mentions.length
-                }
-                this.mentions = response.mentions;
-            });
+            if (this.account) {
+                $.getJSON(sf.host + 'api/mentions?comments=Y&own=Y&username=' + this.account.name, (response) => {
+                    if (this.mentions != null && response.size > this.mentions.length) {
+                        this.newMentions += response.size - this.mentions.length
+                    }
+                    this.mentions = response.mentions;
+                });
+            }
+        },
+        updateFollowers: function () {
+            if (this.account) {
+                steem.api.getFollowCount(this.account.name, (err, result) => {
+                    if (!err) {
+                        this.followers = result;
+                    }
+                });
+            }
         },
         removeLine: function (key, $event) {
             $event.preventDefault();

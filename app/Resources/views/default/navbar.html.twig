@@ -86,12 +86,37 @@
             </div>
         </div>
 
+        <div v-if="followers" class="uk-grid uk-margin-top uk-margin-bottom uk-text-large">
+            <div class="uk-width-1-2 uk-text-center">
+                <small>Follower:</small><br>
+                {% verbatim %}{{ followers.follower_count }}{% endverbatim %}
+            </div>
+            <div class="uk-width-1-2 uk-text-center">
+                <small>Folowing:</small><br>
+                {% verbatim %}{{ followers.following_count }}{% endverbatim %}
+            </div>
+        </div>
+
         <ul class="uk-nav uk-nav-offcanvas" data-uk-nav>
             <li>
                 <a href="#mentions" data-uk-modal>
                     <i class="uk-icon-quote-right"></i>
                     Mentions
                     <span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="uk-text-muted">
+                    <i class="uk-icon-angle-up"></i>
+                    Votes
+                    {#<span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>#}
+                </a>
+            </li>
+            <li>
+                <a href="#" class="uk-text-muted">
+                    <i class="uk-icon-reply"></i>
+                    Replies
+                    {#<span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>#}
                 </a>
             </li>
             <li>
