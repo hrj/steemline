@@ -39,4 +39,13 @@ class SteemClient
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+
+    public function getReplies($author) {
+        $sql = "SELECT c.* FROM sbds.sbds_tx_comments c WHERE c.parent_author = :author ORDER BY timestamp";
+        $params = ['author' => $author];
+
+        $stmt = $this->em->getConnection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 }
