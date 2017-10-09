@@ -76,14 +76,14 @@
             <h3 class="uk-margin-left uk-margin-right">
                 <i class="uk-icon-comments"></i>
                 Replies <span class="uk-text-muted">({% verbatim %}{{ post.children }}{% endverbatim %})</span>
-                <a href="#" class="uk-button uk-button-primary uk-float-right" v-if="!showReplyTextarea" @click="showReplyTextarea = true">
+                <a href="#" class="uk-button uk-button-primary uk-float-right" v-if="account && !showReplyTextarea" @click="showReplyTextarea = true">
                     <i class="uk-icon-pencil"></i> reply
                 </a>
-                <a href="#" class="uk-button uk-float-right" v-if="showReplyTextarea" @click="showReplyTextarea = false">
+                <a href="#" class="uk-button uk-float-right" v-if="account && showReplyTextarea" @click="showReplyTextarea = false">
                     <i class="uk-icon-times"></i> cancel
                 </a>
             </h3>
-            <div class="uk-margin-right uk-margin-left uk-clearfix" v-if="showReplyTextarea">
+            <div class="uk-margin-right uk-margin-left uk-clearfix" v-if="account && showReplyTextarea">
                 <form @submit="submitReply($event)">
                     <textarea class="reply-textarea" @keyup="renderReply($event)"></textarea>
                     <button  class="uk-button uk-button-primary uk-float-right uk-margin-small-top">

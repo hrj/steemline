@@ -52,15 +52,15 @@
                             </div>
                         </div>
                     </li>
-                    <li v-if="!showReplyTextarea">
+                    <li v-if="account && !showReplyTextarea">
                         <a href="#" @click="showReplyTextarea = true"><i class="uk-icon-pencil"></i> reply</a>
                     </li>
-                    <li v-if="showReplyTextarea">
+                    <li v-if="account && showReplyTextarea">
                         <a href="#" @click="showReplyTextarea = false"><i class="uk-icon-times"></i> cancel</a>
                     </li>
                 </ul>
             </header>
-            <div class="uk-clearfix" v-if="showReplyTextarea">
+            <div class="uk-clearfix" v-if="account && showReplyTextarea">
                 <form @submit="submitReply($event)">
                     <textarea class="reply-textarea" @keyup="renderReply($event)"></textarea>
                     <button  class="uk-button uk-button-primary uk-float-right uk-margin-small-top">
