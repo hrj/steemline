@@ -1,3 +1,8 @@
+// Push JS
+if (!Push.Permission.has()) {
+    Push.Permission.request();
+}
+
 // Event Container
 let events = new Vue();
 
@@ -539,7 +544,18 @@ let SteemLine = new Vue({
             if (this.account) {
                 $.getJSON(sf.host + 'api/mentions?comments=Y&own=Y&username=' + this.account.name, (response) => {
                     if (this.mentions != null && response.size > this.mentions.length) {
-                        this.newMentions += response.size - this.mentions.length
+                        this.newMentions += response.size - this.mentions.length;
+                        if (Push.Permission.has()) {
+                            Push.create("You were mentioned!", {
+                                body: "You have been mentioned by " + response[0].author + ' in ' + response[0].title + '!',
+                                icon: 'assets/img/app-icon.png',
+                                timeout: 5000,
+                                onClick: function () {
+                                    window.focus();
+                                    this.close();
+                                }
+                            });
+                        }
                     }
                     this.mentions = response.mentions;
                 });
@@ -561,6 +577,17 @@ let SteemLine = new Vue({
                         let diff = this.votes.filter(votesDiff(response.votes));
                         if (diff.length) {
                             this.newVotes += diff.length;
+                            if (Push.Permission.has()) {
+                                Push.create("Incoming vote!", {
+                                    body: "You have " + diff.length + ' new vote' + (diff.length > 1 ? 's' : '') + '!',
+                                    icon: 'assets/img/app-icon.png',
+                                    timeout: 5000,
+                                    onClick: function () {
+                                        window.focus();
+                                        this.close();
+                                    }
+                                });
+                            }
                         }
                     }
                     this.votes = response.votes;
@@ -735,7 +762,7 @@ function votesDiff(otherArray){
         return otherArray.filter(function(other){
             return other.author == current.author
                 && other.voter == current.voter
-                && other.weight == current.weight
+                // && other.weight == current.weight
                 && other.permlink == current.permlink
                 && other.timestamp == current.timestamp;
         }).length == 0;
