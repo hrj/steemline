@@ -77,29 +77,51 @@ em
     text-align: center
 
 #sidebar
-  color: #fff
-  h2
-    color: #fff
-    font-size: 20px
-    padding: 5px
-    text-align: center
-    background-position: center center
-    background-size: cover
-    margin: 0
+  .uk-offcanvas-bar
+    background: #fff
+    color: #666
+    #sidebar-profile-header
+      background: #00a8e6
+      display: inline-block
+      width: 100%
+      h2
+        color: #fff
+        font-size: 20px
+        padding: 5px
+        text-align: center
+        background-position: center center
+        background-size: cover
+        margin: 0
 
-  .cover-image
-    height: 102px
-    padding: 15px
-    background-position: center center
-    background-size: cover
-  .profile-image
-    width: 70px
-    height: 70px
-    margin: 0 auto
-    border-radius: 50%
-    border: solid 1px #ccc
-    background-position: center center
-    background-size: cover
+      .cover-image
+        height: 102px
+        padding: 15px
+        background-position: center center
+        background-size: cover
+      .profile-image
+        width: 70px
+        height: 70px
+        margin: 0 auto
+        border-radius: 50%
+        border: solid 1px #ccc
+        background-position: center center
+        background-size: cover
+    .uk-nav-offcanvas
+      li
+        a
+          color: #333
+          &:hover,
+          &:active,
+          &:focus
+            background: #00a8e6
+            color: #fff
+          &.uk-text-muted
+            color: #ccc !important
+            &:hover,
+            &:active,
+            &:focus
+              background: #fff
+              color: #ccc
 
 #lines
   padding: 10px

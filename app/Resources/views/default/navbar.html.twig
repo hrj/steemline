@@ -61,26 +61,28 @@
 
 <div id="sidebar" class="uk-offcanvas" v-if="account">
     <div class="uk-offcanvas-bar uk-offcanvas-bar-flip">
-        <div v-if="profileImage && coverImage">
-            <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + ');'">
+        <div id="sidebar-profile-header">
+            <div v-if="profileImage && coverImage">
+                <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + ');'">
+                    <div class="profile-image" :style="'background-image: url(https://steemitimages.com/150x150/' + profileImage + ')'"></div>
+                    <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+                </div>
+            </div>
+
+            <div v-if="profileImage && !coverImage" class="uk-margin-top">
                 <div class="profile-image" :style="'background-image: url(https://steemitimages.com/150x150/' + profileImage + ')'"></div>
                 <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
             </div>
-        </div>
 
-        <div v-if="profileImage && !coverImage" class="uk-margin-top">
-            <div class="profile-image" :style="'background-image: url(https://steemitimages.com/150x150/' + profileImage + ')'"></div>
-            <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
-        </div>
+            <div v-if="!profileImage && coverImage">
+                <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + '); height: 40px;'">
+                    <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
+                </div>
+            </div>
 
-        <div v-if="!profileImage && coverImage">
-            <div class="cover-image" :style="'background-image: url(https://steemitimages.com/270x270/' + coverImage + '); height: 40px;'">
+            <div v-if="!profileImage && !coverImage">
                 <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
             </div>
-        </div>
-
-        <div v-if="!profileImage && !coverImage">
-            <h2>{% verbatim %}@{{ account.name }}{% endverbatim %}</h2>
         </div>
 
         <div class="uk-grid uk-margin-top uk-margin-bottom uk-text-large">
