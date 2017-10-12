@@ -38,6 +38,14 @@
                 </span>
             </a>
         </li>
+        <li v-if="newVotes > 0">
+            <a href="#votes" data-uk-modal data-uk-tooltip :title="newVotes + ' new vote' + (newVotes > 1 ? 's' : '')">
+                <i class="uk-icon-angle-up"></i>
+                <span class="uk-badge uk-badge-notification">
+                    {% verbatim %}{{ newVotes }}{% endverbatim %}
+                </span>
+            </a>
+        </li>
         <li v-if="profileImage">
             <a href="#sidebar" data-uk-offcanvas="{mode:'slide'}">
                 <span class="profile-image" :style="'background-image: url(https://steemitimages.com/50x50/' + profileImage + ')'"></span>
@@ -106,16 +114,16 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="uk-text-muted">
+                <a href="#votes" data-uk-modal>
                     <i class="uk-icon-angle-up"></i>
-                    Votes
-                    {#<span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>#}
+                    Incoming Votes
+                    <span v-if="newVotes > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newVotes }}{% endverbatim %}</span>
                 </a>
             </li>
             <li>
-                <a href="#" class="uk-text-muted">
+                <a href="#" class="uk-text-muted" data-uk-tooltip title="Not available yet.">
                     <i class="uk-icon-reply"></i>
-                    Replies
+                    Incoming Replies
                     {#<span v-if="newMentions > 0" class="uk-badge uk-badge-notification">{% verbatim %}{{ newMentions }}%{% endverbatim %}</span>#}
                 </a>
             </li>
@@ -174,6 +182,35 @@
                     {% verbatim %}{{ mention.author }}{% endverbatim %}
                     |
                     {% verbatim %}{{ mention.created }}{% endverbatim %}
+                </div>
+            </header>
+        </article>
+    </div>
+</div>
+
+<div id="votes" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <div class="uk-modal-header">
+            <h3 class="uk-margin-bottom-remove">Incoming Votes</h3>
+            <h4 class="uk-text-muted uk-margin-top-remove">last 500, {% verbatim %}{{ votesCount }}{% endverbatim %} total</h4>
+        </div>
+        <p v-if="!votes || votes.length == 0" class="uk-text-center">
+            No votes yet.
+        </p>
+        <article class="uk-comment" v-for="(vote, key) in votes" :key="key">
+            <header class="uk-comment-header">
+                <h4 class="uk-comment-title">
+                    {% verbatim %}{{ vote.permlink }}{% endverbatim %}
+                </h4>
+                <div class="uk-comment-meta">
+                    <a :href="'https://steemit.com/@' + vote.voter">
+                        {% verbatim %}{{ vote.voter }}{% endverbatim %}
+                    </a>
+                    |
+                    {% verbatim %}{{ moment.utc(new Date(vote.timestamp)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss')) }}{% endverbatim %}
+                    |
+                    {% verbatim %}{{ vote.weight }} %{% endverbatim %}
                 </div>
             </header>
         </article>

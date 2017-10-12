@@ -398,8 +398,11 @@ let SteemLine = new Vue({
         connecting: true,
         account: null,
         mentions: null,
-        followers: null,
         newMentions: 0,
+        votes: null,
+        newVotes: 0,
+        votesCount: 0,
+        followers: null,
         lines: [],
         defaultLines: [
             {
@@ -473,8 +476,9 @@ let SteemLine = new Vue({
 
                     this.updateMentions();
                     this.updateFollowers();
+                    this.updateVotes();
 
-                    setInterval(this.updateAccount, 60000);
+                    setInterval(this.updateAccount, 30000);
                 });
             } else {
                 this.connecting = false;
@@ -512,6 +516,10 @@ let SteemLine = new Vue({
         $(document).on('hide.uk.modal', '#mentions', () => {
             this.newMentions = 0;
         });
+
+        $(document).on('hide.uk.modal', '#votes', () => {
+            this.newVotes = 0;
+        });
     },
     methods: {
         updateAccount: function () {
@@ -524,6 +532,7 @@ let SteemLine = new Vue({
 
                 this.updateMentions();
                 this.updateFollowers();
+                this.updateVotes();
             });
         },
         updateMentions: function () {
@@ -542,6 +551,23 @@ let SteemLine = new Vue({
                     if (!err) {
                         this.followers = result;
                     }
+                });
+            }
+        },
+        updateVotes: function () {
+            if (this.account) {
+                $.getJSON(sf.host + 'api/votes?username=' + this.account.name + '&perpage=500', (response) => {
+                    if (this.votes) {
+                        let diff = this.votes.filter(votesDiff(response.votes));
+                        if (diff.length) {
+                            this.newVotes += diff.length;
+                        }
+                    }
+                    this.votes = response.votes;
+                });
+
+                $.getJSON(sf.host + 'api/votesCount?username=' + this.account.name, (response) => {
+                    this.votesCount = response;
                 });
             }
         },
@@ -702,4 +728,16 @@ function slugify (title) {
         .replace(/\-\-+/g, '-')         // Replace multiple - with single -
         .replace(/^-+/, '')             // Trim - from start of text
         .replace(/-+$/, '')             // Trim - from end of text
+}
+
+function votesDiff(otherArray){
+    return function(current){
+        return otherArray.filter(function(other){
+            return other.author == current.author
+                && other.voter == current.voter
+                && other.weight == current.weight
+                && other.permlink == current.permlink
+                && other.timestamp == current.timestamp;
+        }).length == 0;
+    }
 }
