@@ -210,7 +210,8 @@
                         {% verbatim %}{{ vote.voter }}{% endverbatim %}
                     </a>
                     |
-                    {% verbatim %}{{ moment.utc(new Date(vote.timestamp)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss')) }}{% endverbatim %}
+                    {#{% verbatim %}{{ moment.utc(new Date(vote.timestamp)).from(moment.utc().format('YYYY-MM-DD HH:mm:ss')) }}{% endverbatim %}#}
+                    {% verbatim %}{{ vote.timestamp }}{% endverbatim %}
                     |
                     {% verbatim %}{{ vote.weight }} %{% endverbatim %}
                 </div>
