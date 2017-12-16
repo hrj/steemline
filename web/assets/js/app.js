@@ -523,18 +523,9 @@ let SteemLine = new Vue({
     },
     methods: {
         updateAccount: function () {
-		/*
-            steem.api.getAccounts([this.account.name], (error, accounts) => {
-                /**
-                 * Why the f*** does this line cause the vote dialog/vote state to reset...
-                 * Upvote a post, see the state change and then flip back again once this line is executed.
-                 */
-                // this.account = accounts[0];
-
-                this.updateMentions();
-                this.updateFollowers();
-                this.updateVotes();
-            // });
+		this.updateMentions();
+		this.updateFollowers();
+		this.updateVotes();
         },
         updateMentions: function () {
             if (this.account) {
