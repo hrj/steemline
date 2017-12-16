@@ -30,8 +30,10 @@
     <script>
         let sf = {
             appName: '{{ app_name }}',
-            redirectUri: '{{ app.request.uri }}',
-            host: '{{ url('homepage') }}'
+            redirectUri: '{{ app.request.uri }}authSteemconnect',
+            host: '{{ url('homepage') }}',
+	    access_token: '{{ app.session.get('access_token') }}',
+	    username: '{{ app.session.get('username') }}'
         };
     </script>
     {% javascripts
@@ -54,7 +56,7 @@
     'assets/vendor/push.js/bin/push.min.js'
     'assets/vendor/vue/dist/vue.min.js'
     'assets/js/steem.min.js'
-    'assets/js/steemconnect.min.js'
+    'assets/js/sc2.min.js'
     'assets/js/lodash.min.js'
     'assets/js/app.js'
     %}

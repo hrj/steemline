@@ -141,7 +141,7 @@ let postMixin = {
                 let reply = replyTextarea.val();
                 let date = new Date();
                 let replyPermlink = 're-' + this.post.author + '-' + this.post.permlink + '-' + date.toISOString().replace(/[.:-]/g, '').toLowerCase();
-                steemconnect.comment(this.post.author, this.post.permlink, this.account.name, replyPermlink, null, reply, null, (err, result) => {
+                steemconnect.comment(this.post.author, this.post.permlink, this.account.name, replyPermlink, "", reply, null, (err, result) => {
                     this.replying = false;
                     if (!err) {
                         this.showReplyTextarea = false;
@@ -468,27 +468,22 @@ let SteemLine = new Vue({
         }
     },
     created: function () {
+	steemconnect = sc2;
         steemconnect.init({
-            app: sf.appName,
-            callbackURL: sf.redirectUri
+            app: "steemline.app",
+            callbackURL: sf.redirectUri,
+            scope: ['vote', 'comment']
         });
 
-        steemconnect.isAuthenticated((error, auth) => {
-            if (!error && auth.isAuthenticated) {
-                steem.api.getAccounts([auth.username], (error, accounts) => {
-                    this.account = accounts[0];
-                    this.connecting = false;
-
-                    this.updateMentions();
-                    this.updateFollowers();
-                    this.updateVotes();
-
-                    setInterval(this.updateAccount, 30000);
-                });
-            } else {
-                this.connecting = false;
-            }
-        });
+	this.connecting = false;
+	if (sf.access_token) {
+	  this.account = {name : sf.username};
+	  sc2.setAccessToken(sf.access_token);
+	  sc2.me(function (err, result) {
+	    setTimeout(this.updateAccount, 1);
+	    setInterval(this.updateAccount, 30000);
+	  });
+	}
 
         if (loadFromLocalStorage('lines')) {
             this.lines = loadFromLocalStorage('lines');
@@ -528,17 +523,18 @@ let SteemLine = new Vue({
     },
     methods: {
         updateAccount: function () {
+		/*
             steem.api.getAccounts([this.account.name], (error, accounts) => {
                 /**
                  * Why the f*** does this line cause the vote dialog/vote state to reset...
                  * Upvote a post, see the state change and then flip back again once this line is executed.
                  */
-                this.account = accounts[0];
+                // this.account = accounts[0];
 
                 this.updateMentions();
                 this.updateFollowers();
                 this.updateVotes();
-            });
+            // });
         },
         updateMentions: function () {
             if (this.account) {
@@ -665,7 +661,7 @@ let SteemLine = new Vue({
                 permlink = permlink.substr(0, 255);
             }
 
-            steemconnect.comment(null, tags[0], this.account.name, permlink, this.currentDraftTitle, this.currentDraft, JSON.stringify(metaData), (err, result) => {
+            steemconnect.comment("", tags[0], this.account.name, permlink, this.currentDraftTitle, this.currentDraft, JSON.stringify(metaData), (err, result) => {
                 if (!err) {
                     this.currentDraft = '';
                     this.currentDraftTitle = '';
