@@ -29,11 +29,11 @@
 {% block javascripts %}
     <script>
         let sf = {
-            appName: '{{ app_name }}',
-            redirectUri: '{{ app.request.uri }}authSteemconnect',
-            host: '{{ url('homepage') }}',
-	    access_token: '{{ app.session.get('access_token') }}',
-	    username: '{{ app.session.get('username') }}'
+          appName: '{{ app_name }}',
+          redirectUri: '{{ app.request.uri }}authSteemconnect',
+          host: '{{ url('homepage') }}',
+          access_token: '{{ app.session.get('access_token') }}',
+          username: '{{ app.session.get('username') }}'
         };
     </script>
     {% javascripts
