@@ -475,14 +475,16 @@ let SteemLine = new Vue({
             scope: ['vote', 'comment']
         });
 
-	this.connecting = false;
 	if (sf.access_token) {
-	  this.account = {name : sf.username};
 	  sc2.setAccessToken(sf.access_token);
-	  sc2.me(function (err, result) {
-	    setTimeout(this.updateAccount, 1);
+	  sc2.me((err, result) => {
+	    this.connecting = false;
+	    this.account = result.account;
+	    this.updateAccount();
 	    setInterval(this.updateAccount, 30000);
 	  });
+	} else {
+	  this.connecting = false;
 	}
 
         if (loadFromLocalStorage('lines')) {
