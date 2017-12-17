@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,10 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/authSteemconnect", name="auth from steem connect")
+     * @Route("/auth", name="auth_steemconnect")
+     * @param Request $request
+     * @param SessionInterface $session
+     * @return RedirectResponse|Response
      */
     public function authAction(Request $request, SessionInterface $session)
     {
@@ -28,37 +32,19 @@ class DefaultController extends Controller
             $session->set('access_token', $query->get('access_token'));
             $username = $query->get('username');
             $session->set('username', $username);
-            return new Response("<body>
-<h3>Authentication successful!</h3>
-<h3>Click <a href='/'>here to continue</a> as <b>$username</b>.</h3>
-</body>");
+            return new RedirectResponse($this->generateUrl('homepage'));
         }
         return new Response("<body><p>Access token not found</p></body>");
     }
 
     /**
      * @Route("/logout", name="logout")
+     * @param SessionInterface $session
+     * @return RedirectResponse
      */
     public function logoutAction(SessionInterface $session)
     {
         $session->clear();
-        return new Response("<body>
-<h3>You have been logged out!</h3>
-<h3>Click <a href='/'>here to continue</a>.</h3>
-</body>");
-    }
-
-    /**
-     * @Route("/test", name="testpage")
-     */
-    public function testAction(SessionInterface $session)
-    {
-
-        return new Response("<body>
-<p>access token: " . $session->get('access_token', 'not set') . "</p>
-<p>username: " . $session->get('username', 'not set') . "</p>
-<h3>Click <a href='/'>here to continue to home page</a>.</h3>
-<h3>Click <a href='/logout'>here to logout</a>.</h3>
-</body>");
+        return new RedirectResponse($this->generateUrl('homepage'));
     }
 }

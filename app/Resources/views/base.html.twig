@@ -30,7 +30,7 @@
     <script>
         let sf = {
           appName: '{{ app_name }}',
-          redirectUri: '{{ app.request.uri }}authSteemconnect',
+          redirectUri: '{{ url('auth_steemconnect') }}',
           host: '{{ url('homepage') }}',
           access_token: '{{ app.session.get('access_token') }}',
           username: '{{ app.session.get('username') }}'
